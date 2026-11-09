@@ -1,0 +1,13 @@
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  AgroConecta.Domain -> /home/v/Projetos/work/PIM_4-web/src/AgroConecta.Domain/bin/Release/net10.0/AgroConecta.Domain.dll
+  AgroConecta.Application -> /home/v/Projetos/work/PIM_4-web/src/AgroConecta.Application/bin/Release/net10.0/AgroConecta.Application.dll
+  AgroConecta.Infrastructure -> /home/v/Projetos/work/PIM_4-web/src/AgroConecta.Infrastructure/bin/Release/net10.0/AgroConecta.Infrastructure.dll
+  AgroConecta.Web -> /home/v/Projetos/work/PIM_4-web/src/AgroConecta.Web/bin/Release/net10.0/AgroConecta.Web.dll
+  AgroConecta.Tests -> /home/v/Projetos/work/PIM_4-web/src/AgroConecta.Tests/bin/Release/net10.0/AgroConecta.Tests.dll
+
+Compilação com êxito.
+    0 Aviso(s)
+    0 Erro(s)
+
+Tempo Decorrido 00:00:08.75

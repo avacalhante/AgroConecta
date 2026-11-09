@@ -1,0 +1,11 @@
+Relatório de cobertura (dotnet test --collect:XPlat Code Coverage)
+Gerado em: 2026-11-09
+
+AgroConecta.Application: linhas 93.8% | branches 77.7%
+AgroConecta.Domain: linhas 92.5% | branches 80.0%
+AgroConecta.Infrastructure: linhas 27.5% | branches 82.0%
+AgroConecta.Web: linhas 76.7% | branches 62.5%
+
+Total do agregado: linhas 50.0%
+
+Meta da Parte A: >= 70% em Domain e Application.

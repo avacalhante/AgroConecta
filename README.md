@@ -116,3 +116,5 @@ Consulte `PLAN.md` para o cronograma, pacotes de trabalho, critérios de aceite 
 - `docs/manual.md` — manual do PIM IV (fonte de verdade).
 - `docs/rascunho.md` — escopo funcional v2.0.
 - `PLAN.md` — plano de desenvolvimento.
+- `evidencias/` — pacote de evidências da Parte A (Web, API, banco, DevOps, testes, inclusão e gestão).
+- `docs/devops.md` e `docs/seguranca-lgpd.md` — execução, implantação e checklists (worktree `feat/web-core`).
