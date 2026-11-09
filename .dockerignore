@@ -1,0 +1,13 @@
+bin/
+obj/
+.git/
+.github/
+.vs/
+.idea/
+**/*.user
+**/*.swp
+TestResults/
+coverage/
+src/AgroConecta.Web/wwwroot/uploads/
+*.db
+*.log

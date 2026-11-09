@@ -22,5 +22,26 @@ services:
       retries: 12
       start_period: 30s
 
+  web:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: agroconecta-web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Ambiente de demonstração: aplica migrations e seed automaticamente.
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Default: "Server=db,1433;Database=AgroConecta;User Id=sa;Password=${MSSQL_SA_PASSWORD:-AgroConecta@2026};TrustServerCertificate=True;Encrypt=False"
+      Jwt__Chave: "${JWT_CHAVE:-dev-chave-simetrica-agroconecta-2026-altere-em-producao}"
+    ports:
+      - "8080:8080"
+    volumes:
+      - agroconecta-uploads:/app/wwwroot/uploads
+
 volumes:
   agroconecta-dados:
+  agroconecta-uploads:
