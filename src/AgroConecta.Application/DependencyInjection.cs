@@ -1,5 +1,6 @@
 using AgroConecta.Application.Auth;
 using AgroConecta.Application.Common;
+using AgroConecta.Application.Lotes;
 using AgroConecta.Application.Pedidos;
 using AgroConecta.Application.Produtos;
 using FluentValidation;
@@ -26,6 +27,11 @@ public static class DependencyInjection
         services.AddScoped<ICasoDeUso<LoginComando, LoginResultado>, AutenticarCasoDeUso>();
         services.AddScoped<ICasoDeUso<RenovarTokenComando, LoginResultado>, RenovarTokenCasoDeUso>();
         services.AddScoped<ICasoDeUso<int, UsuarioDto>, ObterUsuarioAtualCasoDeUso>();
+
+        services.AddScoped<ICasoDeUso<ListarLotesConsulta, Domain.Common.ResultadoPaginado<LoteDto>>, ListarLotesCasoDeUso>();
+        services.AddScoped<ICasoDeUso<ListarMeusLotesConsulta, Domain.Common.ResultadoPaginado<LoteDto>>, ListarMeusLotesCasoDeUso>();
+        services.AddScoped<ICasoDeUso<int, LoteDto>, ObterLoteCasoDeUso>();
+        services.AddScoped<ICasoDeUso<CriarLoteComando, LoteDto>, CriarLoteCasoDeUso>();
 
         return services;
     }

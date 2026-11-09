@@ -24,6 +24,8 @@ public class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : IExcepti
             ValidacaoException => (StatusCodes.Status400BadRequest, "validacao", "Erro de validação"),
             RegraNegocioException => (StatusCodes.Status422UnprocessableEntity, "regra-negocio", "Regra de negócio violada"),
             RecursoNaoEncontradoException => (StatusCodes.Status404NotFound, "nao-encontrado", "Recurso não encontrado"),
+            ConflitoException => (StatusCodes.Status409Conflict, "conflito", "Conflito de recurso"),
+            AcessoNegadoException => (StatusCodes.Status403Forbidden, "sem-permissao", "Sem permissão"),
             UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "nao-autenticado", "Não autenticado"),
             _ => (StatusCodes.Status500InternalServerError, "inesperado", "Erro inesperado"),
         };
