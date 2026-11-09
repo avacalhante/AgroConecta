@@ -1,61 +1,58 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
-import { Screen } from '../components/Screen';
+import { Card, Screen, StatusBadge } from '../components';
+import { LOTES_EXEMPLO, type LoteExemplo } from '../mock/dados';
+import type { MainTabScreenProps } from '../navigation/types';
+import { statusMeta } from '../theme/status';
 import { theme } from '../theme/tokens';
-
-type LoteExemplo = {
-  id: string;
-  produto: string;
-  quantidade: string;
-  colheita: string;
-  status: string;
-};
-
-const LOTES_EXEMPLO: LoteExemplo[] = [
-  {
-    id: '1',
-    produto: 'Tomate italiano',
-    quantidade: '120 kg',
-    colheita: '01/11/2026',
-    status: 'Disponível',
-  },
-  {
-    id: '2',
-    produto: 'Alface crespa',
-    quantidade: '80 un',
-    colheita: '02/11/2026',
-    status: 'Reservado',
-  },
-];
+import { typography } from '../theme/typography';
+import { formatarData, formatarQuantidade } from '../utils/format';
 
 /** Lista provisória de lotes do produtor; a fonte real entra nas tarefas B4 e B6. */
-export function LotesScreen() {
+export function LotesScreen({ navigation }: MainTabScreenProps<'Lotes'>) {
   return (
     <Screen padded={false}>
       <View style={styles.cabecalho}>
-        <Text style={styles.titulo}>Meus lotes</Text>
-        <Text style={styles.descricao}>
-          Dados de exemplo até a integração da fila offline.
-        </Text>
+        <Text style={typography.titulo}>Meus lotes</Text>
+        <Text style={styles.descricao}>Dados de exemplo até a integração da fila offline.</Text>
       </View>
 
       <FlatList
         data={LOTES_EXEMPLO}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.lista}
-        renderItem={({ item }) => (
-          <View
-            style={styles.cartao}
-            accessible
-            accessibilityLabel={`${item.produto}, ${item.quantidade}, colhido em ${item.colheita}, status ${item.status}`}
-          >
-            <Text style={styles.produto}>{item.produto}</Text>
-            <Text style={styles.detalhe}>{item.quantidade} • colheita {item.colheita}</Text>
-            <Text style={styles.status}>{item.status}</Text>
-          </View>
-        )}
+        renderItem={({ item }) => <ItemLote item={item} navigation={navigation} />}
       />
     </Screen>
+  );
+}
+
+type ItemLoteProps = {
+  item: LoteExemplo;
+  navigation: MainTabScreenProps<'Lotes'>['navigation'];
+};
+
+function ItemLote({ item, navigation }: ItemLoteProps) {
+  return (
+    <Card
+      onPress={() => navigation.navigate('LoteDetalhe', { loteId: item.id })}
+      accessibilityLabel={`${item.produto}, ${formatarQuantidade(
+        item.quantidade,
+        item.unidade,
+      )}, colhido em ${formatarData(item.dataColheita)}, status ${
+        statusMeta[item.status].label
+      }`}
+      testID={`lote-${item.id}`}
+    >
+      <View style={styles.linhaTitulo}>
+        <Text style={[typography.secao, styles.produto]}>{item.produto}</Text>
+        <StatusBadge status={item.status} />
+      </View>
+      <Text style={styles.detalhe}>
+        {formatarQuantidade(item.quantidade, item.unidade)} • colheita{' '}
+        {formatarData(item.dataColheita)}
+      </Text>
+    </Card>
   );
 }
 
@@ -63,43 +60,25 @@ const styles = StyleSheet.create({
   cabecalho: {
     paddingHorizontal: theme.spacing.md,
     paddingTop: theme.spacing.md,
-  },
-  titulo: {
-    fontSize: theme.fontSize.headline,
-    fontWeight: '700',
-    color: theme.colors.text,
+    gap: theme.spacing.xs,
   },
   descricao: {
-    marginTop: theme.spacing.xs,
-    fontSize: theme.fontSize.body,
-    color: theme.colors.textMuted,
+    ...typography.corpoMuted,
   },
   lista: {
     padding: theme.spacing.md,
     gap: theme.spacing.md,
   },
-  cartao: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    padding: theme.spacing.md,
+  linhaTitulo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
   },
   produto: {
-    fontSize: theme.fontSize.bodyLarge,
-    fontWeight: '600',
-    color: theme.colors.text,
+    flexShrink: 1,
   },
   detalhe: {
-    marginTop: theme.spacing.xs,
-    fontSize: theme.fontSize.body,
-    color: theme.colors.textMuted,
-  },
-  status: {
-    marginTop: theme.spacing.sm,
-    fontSize: theme.fontSize.caption,
-    fontWeight: '700',
-    color: theme.colors.primary,
-    textTransform: 'uppercase',
+    ...typography.corpoMuted,
   },
 });

@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 
-import { Screen } from '../components/Screen';
+import { Button, Card, Screen } from '../components';
 import { theme } from '../theme/tokens';
+import { typography } from '../theme/typography';
 
 type PerfilScreenProps = {
   onSair: () => void;
@@ -11,79 +12,39 @@ type PerfilScreenProps = {
 export function PerfilScreen({ onSair }: PerfilScreenProps) {
   return (
     <Screen scrollable>
-      <Text style={styles.titulo}>Perfil</Text>
+      <Text style={[typography.titulo, styles.titulo]}>Perfil</Text>
 
-      <View style={styles.cartao}>
-        <Text style={styles.nome}>Usuário de desenvolvimento</Text>
+      <Card title="Usuário">
+        <Text style={typography.secao}>Usuário de desenvolvimento</Text>
         <Text style={styles.detalhe}>Papel: Produtor</Text>
         <Text style={styles.detalhe}>Sessão simulada até a tarefa B2</Text>
-      </View>
+      </Card>
 
-      <View style={styles.cartao}>
-        <Text style={styles.secao}>Sincronização</Text>
+      <Card title="Sincronização">
         <Text style={styles.detalhe}>
           Fila offline ainda não implementada (tarefa B6). Nenhum item pendente.
         </Text>
-      </View>
+      </Card>
 
-      <Pressable
-        accessibilityRole="button"
+      <Button
+        title="Sair"
+        variant="danger"
         onPress={onSair}
-        style={({ pressed }) => [styles.botaoSair, pressed && styles.botaoPressionado]}
+        style={styles.botaoSair}
         testID="botao-sair"
-      >
-        <Text style={styles.textoBotaoSair}>Sair</Text>
-      </Pressable>
+      />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   titulo: {
-    fontSize: theme.fontSize.headline,
-    fontWeight: '700',
-    color: theme.colors.text,
     marginBottom: theme.spacing.lg,
   },
-  cartao: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    padding: theme.spacing.md,
-    marginBottom: theme.spacing.md,
-  },
-  nome: {
-    fontSize: theme.fontSize.bodyLarge,
-    fontWeight: '600',
-    color: theme.colors.text,
-  },
-  secao: {
-    fontSize: theme.fontSize.body,
-    fontWeight: '700',
-    color: theme.colors.text,
-    marginBottom: theme.spacing.xs,
-  },
   detalhe: {
-    marginTop: theme.spacing.xs,
-    fontSize: theme.fontSize.body,
-    color: theme.colors.textMuted,
+    ...typography.corpoMuted,
   },
   botaoSair: {
     marginTop: theme.spacing.md,
-    minHeight: theme.touchTarget,
-    borderRadius: theme.radius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.danger,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  botaoPressionado: {
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  textoBotaoSair: {
-    color: theme.colors.danger,
-    fontSize: theme.fontSize.body,
-    fontWeight: '700',
   },
 });

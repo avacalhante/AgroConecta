@@ -40,15 +40,37 @@ Em dispositivo físico, use o IP da máquina na rede local (`http://192.168.0.10
 ```text
 src/
 ├── api/         cliente HTTP e configuração (B3)
-├── components/  componentes reutilizáveis
+├── components/  design system: botão, campo, cartão, badge, estados
 ├── db/          SQLite local (B6)
-├── navigation/  stack raiz e abas principais (B1)
+├── mock/        fixtures das telas de demonstração
+├── navigation/  pilha raiz, pilha autenticada e abas principais
 ├── screens/     telas do produtor e do motorista
 ├── sync/        fila offline e sincronização (B6)
-├── theme/       cores, espaçamentos e tipografia
-├── types/       tipos gerados do contrato OpenAPI (B3)
+├── theme/       tokens, tipografia e tema de status
+├── types/       tipos de domínio e, na B3, tipos gerados do OpenAPI
 └── utils/       formatadores e helpers
 ```
+
+## Navegação
+
+- `RootNavigator`: pilha raiz com `Login` e `Main` (autenticado).
+- `MainStack`: abas principais mais as telas de detalhe:
+  - `LoteDetalhe` (parâmetro `loteId`);
+  - `EntregaDetalhe`, `EntregaStatus` e `EntregaEvidencia` (parâmetro `entregaId`).
+- `MainTabs`: Início, Lotes, Entregas e Perfil. As telas de aba usam `MainTabScreenProps`,
+  que combina a navegação das abas com a pilha principal.
+
+## Design system
+
+`src/components/` concentra `Button`, `Field`, `Card`, `StatusBadge`, `EmptyState`,
+`LoadingState`, `ErrorState` e `InfoRow`. O tema fica em `src/theme/`:
+
+- `tokens.ts`: cores semânticas, espaçamento, raio, fonte, pesos, alturas de linha e estados;
+- `typography.ts`: estilos de texto;
+- `status.ts`: rótulo em pt-BR e tom visual de cada status do contrato.
+
+Os componentes mantêm alvo de toque mínimo de 48 px, `accessibilityLabel` explícito e
+não fixam altura de texto, para funcionar com fonte ampliada.
 
 ## Convenções
 

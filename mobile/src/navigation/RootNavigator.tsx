@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { LoginScreen } from '../screens/LoginScreen';
 import { theme } from '../theme/tokens';
-import { MainTabs } from './MainTabs';
+import { MainStack } from './MainStack';
 import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -33,7 +33,7 @@ export function RootNavigator() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {autenticado ? (
           <Stack.Screen name="Main">
-            {() => <MainTabs onSair={() => setAutenticado(false)} />}
+            {() => <MainStack onSair={() => setAutenticado(false)} />}
           </Stack.Screen>
         ) : (
           <Stack.Screen name="Login">

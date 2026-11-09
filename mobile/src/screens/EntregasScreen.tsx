@@ -1,60 +1,53 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
-import { Screen } from '../components/Screen';
+import { Card, Screen, StatusBadge } from '../components';
+import { ENTREGAS_EXEMPLO, type EntregaExemplo } from '../mock/dados';
+import type { MainTabScreenProps } from '../navigation/types';
+import { statusMeta } from '../theme/status';
 import { theme } from '../theme/tokens';
-
-type EntregaExemplo = {
-  id: string;
-  pedido: string;
-  destino: string;
-  prevista: string;
-  status: string;
-};
-
-const ENTREGAS_EXEMPLO: EntregaExemplo[] = [
-  {
-    id: '1',
-    pedido: 'Pedido 1',
-    destino: 'Campinas/SP',
-    prevista: '05/11/2026',
-    status: 'Em rota',
-  },
-  {
-    id: '2',
-    pedido: 'Pedido 2',
-    destino: 'Valinhos/SP',
-    prevista: '06/11/2026',
-    status: 'Pendente',
-  },
-];
+import { typography } from '../theme/typography';
+import { formatarData } from '../utils/format';
 
 /** Lista provisória de entregas do motorista; fluxo real nas tarefas B5 e B7. */
-export function EntregasScreen() {
+export function EntregasScreen({ navigation }: MainTabScreenProps<'Entregas'>) {
   return (
     <Screen padded={false}>
       <View style={styles.cabecalho}>
-        <Text style={styles.titulo}>Minhas entregas</Text>
+        <Text style={typography.titulo}>Minhas entregas</Text>
         <Text style={styles.descricao}>Dados de exemplo até a integração da API.</Text>
       </View>
 
       <FlatList
         data={ENTREGAS_EXEMPLO}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         contentContainerStyle={styles.lista}
-        renderItem={({ item }) => (
-          <View
-            style={styles.cartao}
-            accessible
-            accessibilityLabel={`${item.pedido}, destino ${item.destino}, prevista para ${item.prevista}, status ${item.status}`}
-          >
-            <Text style={styles.pedido}>{item.pedido}</Text>
-            <Text style={styles.detalhe}>Destino: {item.destino}</Text>
-            <Text style={styles.detalhe}>Prevista: {item.prevista}</Text>
-            <Text style={styles.status}>{item.status}</Text>
-          </View>
-        )}
+        renderItem={({ item }) => <ItemEntrega item={item} navigation={navigation} />}
       />
     </Screen>
+  );
+}
+
+type ItemEntregaProps = {
+  item: EntregaExemplo;
+  navigation: MainTabScreenProps<'Entregas'>['navigation'];
+};
+
+function ItemEntrega({ item, navigation }: ItemEntregaProps) {
+  return (
+    <Card
+      onPress={() => navigation.navigate('EntregaDetalhe', { entregaId: item.id })}
+      accessibilityLabel={`Pedido ${item.pedidoId}, destino ${item.destino}, prevista para ${formatarData(
+        item.dataPrevista,
+      )}, status ${statusMeta[item.status].label}`}
+      testID={`entrega-${item.id}`}
+    >
+      <View style={styles.linhaTitulo}>
+        <Text style={[typography.secao, styles.pedido]}>Pedido {item.pedidoId}</Text>
+        <StatusBadge status={item.status} />
+      </View>
+      <Text style={styles.detalhe}>Destino: {item.destino}</Text>
+      <Text style={styles.detalhe}>Prevista: {formatarData(item.dataPrevista)}</Text>
+    </Card>
   );
 }
 
@@ -62,43 +55,25 @@ const styles = StyleSheet.create({
   cabecalho: {
     paddingHorizontal: theme.spacing.md,
     paddingTop: theme.spacing.md,
-  },
-  titulo: {
-    fontSize: theme.fontSize.headline,
-    fontWeight: '700',
-    color: theme.colors.text,
+    gap: theme.spacing.xs,
   },
   descricao: {
-    marginTop: theme.spacing.xs,
-    fontSize: theme.fontSize.body,
-    color: theme.colors.textMuted,
+    ...typography.corpoMuted,
   },
   lista: {
     padding: theme.spacing.md,
     gap: theme.spacing.md,
   },
-  cartao: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    padding: theme.spacing.md,
+  linhaTitulo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
   },
   pedido: {
-    fontSize: theme.fontSize.bodyLarge,
-    fontWeight: '600',
-    color: theme.colors.text,
+    flexShrink: 1,
   },
   detalhe: {
-    marginTop: theme.spacing.xs,
-    fontSize: theme.fontSize.body,
-    color: theme.colors.textMuted,
-  },
-  status: {
-    marginTop: theme.spacing.sm,
-    fontSize: theme.fontSize.caption,
-    fontWeight: '700',
-    color: theme.colors.info,
-    textTransform: 'uppercase',
+    ...typography.corpoMuted,
   },
 });
