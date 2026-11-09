@@ -1,9 +1,11 @@
 using AgroConecta.Application.Auth;
 using AgroConecta.Application.Common;
+using AgroConecta.Application.Cooperativas;
 using AgroConecta.Application.Entregas;
 using AgroConecta.Application.Indicadores;
 using AgroConecta.Application.Lotes;
 using AgroConecta.Application.Pedidos;
+using AgroConecta.Application.Produtores;
 using AgroConecta.Application.Produtos;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,6 +42,9 @@ public static class DependencyInjection
         services.AddScoped<ICasoDeUso<RegistrarEvidenciaComando, EntregaDto>, RegistrarEvidenciaCasoDeUso>();
 
         services.AddScoped<ICasoDeUso<bool, IndicadoresDto>, ObterIndicadoresCasoDeUso>();
+
+        services.AddScoped<ICasoDeUso<AprovarProdutorComando, bool>, AprovarProdutorCasoDeUso>();
+        services.AddScoped<ICasoDeUso<CriarCooperativaComando, int>, CriarCooperativaCasoDeUso>();
 
         return services;
     }
