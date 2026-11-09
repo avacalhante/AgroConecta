@@ -1,5 +1,7 @@
 using AgroConecta.Application.Common;
+using AgroConecta.Application.Faturas;
 using AgroConecta.Application.Pedidos;
+using AgroConecta.Domain.Abstractions;
 using AgroConecta.Domain.Common;
 using AgroConecta.Domain.Enums;
 using AgroConecta.Domain.Exceptions;
@@ -13,7 +15,9 @@ namespace AgroConecta.Web.Controllers;
 public class PedidosWebController(
     ICasoDeUso<ListarPedidosConsulta, ResultadoPaginado<PedidoDto>> listarPedidos,
     ICasoDeUso<int, PedidoDto> obterPedido,
-    ICasoDeUso<AlterarStatusPedidoComando, PedidoDto> alterarStatus) : Controller
+    ICasoDeUso<AlterarStatusPedidoComando, PedidoDto> alterarStatus,
+    ICasoDeUso<GerarFaturaComando, FaturaDto> gerarFatura,
+    IFaturaRepositorio faturas) : Controller
 {
     public async Task<IActionResult> Index(
         int page = 1,
@@ -41,12 +45,38 @@ public class PedidosWebController(
                 return NotFound();
             }
 
+            ViewData["Fatura"] = await faturas.ObterPorPedidoAsync(id, cancellationToken);
             return View(pedido);
         }
         catch (RecursoNaoEncontradoException)
         {
             return NotFound();
         }
+    }
+
+    [HttpPost]
+    [Authorize(Policy = "SomenteAdmin")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> GerarFatura(int id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var fatura = await gerarFatura.ExecutarAsync(
+                new GerarFaturaComando(id),
+                cancellationToken);
+
+            TempData["Mensagem"] = $"Fatura {fatura.Numero} gerada com sucesso.";
+        }
+        catch (RegraNegocioException excecao)
+        {
+            TempData["Erro"] = excecao.Message;
+        }
+        catch (RecursoNaoEncontradoException)
+        {
+            return NotFound();
+        }
+
+        return RedirectToAction(nameof(Detalhe), new { id });
     }
 
     [HttpPost]

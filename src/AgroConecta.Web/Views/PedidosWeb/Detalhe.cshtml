@@ -105,5 +105,38 @@
                 </div>
             </div>
         }
+
+        @{
+            var fatura = ViewData["Fatura"] as AgroConecta.Domain.Entities.Fatura;
+            var ehAdmin = User.IsInRole(nameof(AgroConecta.Domain.Enums.PapelUsuario.Admin));
+        }
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-body">
+                <h2 class="h6 text-uppercase text-muted mb-3">Fatura</h2>
+                @if (fatura is not null)
+                {
+                    <dl class="row mb-0 small">
+                        <dt class="col-5">Número</dt>
+                        <dd class="col-7">@fatura.Numero</dd>
+                        <dt class="col-5">Valor</dt>
+                        <dd class="col-7">@fatura.Valor.ToString("C")</dd>
+                        <dt class="col-5">Status</dt>
+                        <dd class="col-7"><span class="badge @Badges.Fatura(fatura.Status)">@fatura.Status</span></dd>
+                    </dl>
+                }
+                else if (ehAdmin)
+                {
+                    <form asp-action="GerarFatura" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-sm btn-outline-success">Gerar fatura</button>
+                    </form>
+                }
+                else
+                {
+                    <p class="text-muted small mb-0">Nenhuma fatura emitida.</p>
+                }
+            </div>
+        </div>
     </div>
 </div>

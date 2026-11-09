@@ -60,6 +60,17 @@ public record EntregaResumo(
     string? Motorista,
     string? FotoUrl);
 
+public record MotoristaResumo(int Id, string Nome, string CNH);
+
+public record VeiculoResumo(int Id, string Placa, string Tipo, decimal CapacidadeKg);
+
+public record PedidoSemEntregaResumo(
+    int Id,
+    string Comprador,
+    StatusPedido Status,
+    decimal ValorTotal,
+    DateTime DataPedido);
+
 /// <summary>Consultas de leitura otimizadas para o painel Web administrativo.</summary>
 public interface IConsultasWebRepositorio
 {
@@ -81,5 +92,14 @@ public interface IConsultasWebRepositorio
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<EntregaResumo>> ListarEntregasAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<MotoristaResumo>> ListarMotoristasAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<VeiculoResumo>> ListarVeiculosAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<PedidoSemEntregaResumo>> ListarPedidosSemEntregaAsync(
         CancellationToken cancellationToken = default);
 }

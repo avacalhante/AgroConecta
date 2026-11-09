@@ -113,4 +113,45 @@ public class ConsultasWebRepositorio(AgroConectaDbContext contexto) : IConsultas
                 entrega.Rota != null ? entrega.Rota.Motorista.Usuario.Nome : null,
                 entrega.FotoUrl))
             .ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyList<MotoristaResumo>> ListarMotoristasAsync(
+        CancellationToken cancellationToken = default) =>
+        await contexto.Motoristas
+            .AsNoTracking()
+            .Where(motorista => motorista.Ativo)
+            .OrderBy(motorista => motorista.Usuario.Nome)
+            .Select(motorista => new MotoristaResumo(
+                motorista.Id,
+                motorista.Usuario.Nome,
+                motorista.CNH))
+            .ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyList<VeiculoResumo>> ListarVeiculosAsync(
+        CancellationToken cancellationToken = default) =>
+        await contexto.Veiculos
+            .AsNoTracking()
+            .Where(veiculo => veiculo.Ativo)
+            .OrderBy(veiculo => veiculo.Placa)
+            .Select(veiculo => new VeiculoResumo(
+                veiculo.Id,
+                veiculo.Placa,
+                veiculo.Tipo,
+                veiculo.CapacidadeKg))
+            .ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyList<PedidoSemEntregaResumo>> ListarPedidosSemEntregaAsync(
+        CancellationToken cancellationToken = default) =>
+        await contexto.Pedidos
+            .AsNoTracking()
+            .Where(pedido => pedido.Entrega == null
+                && pedido.Status != StatusPedido.Cancelado
+                && pedido.Status != StatusPedido.Rascunho)
+            .OrderBy(pedido => pedido.Id)
+            .Select(pedido => new PedidoSemEntregaResumo(
+                pedido.Id,
+                pedido.Comprador.Nome,
+                pedido.Status,
+                pedido.ValorTotal,
+                pedido.DataPedido))
+            .ToListAsync(cancellationToken);
 }

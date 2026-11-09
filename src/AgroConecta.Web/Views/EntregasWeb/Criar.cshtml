@@ -1,0 +1,108 @@
+@model AgroConecta.Web.Models.RotaViewModel
+@{
+    ViewData["Title"] = "Nova rota";
+}
+
+<div class="row justify-content-center mt-3">
+    <div class="col-lg-9">
+        <h1 class="h3 mb-3">Nova rota</h1>
+
+        <form asp-action="Criar" method="post" class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <div class="row g-3">
+                    <div class="col-sm-4">
+                        <label asp-for="Data" class="form-label"></label>
+                        <input asp-for="Data" class="form-control" type="date" />
+                        <span asp-validation-for="Data" class="text-danger small"></span>
+                    </div>
+                    <div class="col-sm-4">
+                        <label asp-for="MotoristaId" class="form-label"></label>
+                        <select asp-for="MotoristaId" class="form-select">
+                            <option value="0">Selecione…</option>
+                            @foreach (var motorista in Model.Motoristas)
+                            {
+                                <option value="@motorista.Id">
+                                    @motorista.Nome (@motorista.CNH)
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="MotoristaId" class="text-danger small"></span>
+                    </div>
+                    <div class="col-sm-4">
+                        <label asp-for="VeiculoId" class="form-label"></label>
+                        <select asp-for="VeiculoId" class="form-select">
+                            <option value="0">Selecione…</option>
+                            @foreach (var veiculo in Model.Veiculos)
+                            {
+                                <option value="@veiculo.Id">
+                                    @veiculo.Placa · @veiculo.Tipo (@veiculo.CapacidadeKg kg)
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="VeiculoId" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <h2 class="h6 text-uppercase text-muted mt-4 mb-2">Pedidos disponíveis</h2>
+                <span asp-validation-for="PedidoIds" class="text-danger small d-block"></span>
+
+                @if (Model.Pedidos.Count == 0)
+                {
+                    <p class="text-muted mb-0">Nenhum pedido disponível para roteirização.</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <caption class="visually-hidden">Pedidos disponíveis para rota</caption>
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" class="w-25">Selecionar</th>
+                                    <th scope="col">Pedido</th>
+                                    <th scope="col">Comprador</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col" class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var pedido in Model.Pedidos)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="PedidoIds" value="@pedido.Id"
+                                                       id="pedido-@pedido.Id"
+                                                       checked="@(Model.PedidoIds.Contains(pedido.Id) ? "checked" : null)" />
+                                                <label class="form-check-label" for="pedido-@pedido.Id">
+                                                    #@pedido.Id
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>@pedido.Id</td>
+                                        <td>@pedido.Comprador</td>
+                                        <td><span class="badge @Badges.Pedido(pedido.Status)">@pedido.Status</span></td>
+                                        <td class="text-end">@pedido.ValorTotal.ToString("C")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+
+            <div class="card-footer bg-white d-flex justify-content-end gap-2">
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-success" disabled="@(Model.Pedidos.Count == 0 ? "disabled" : null)">
+                    Programar rota
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
