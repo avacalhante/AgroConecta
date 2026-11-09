@@ -1,9 +1,27 @@
+using AgroConecta.Infrastructure;
+using AgroConecta.Infrastructure.Persistence;
+using AgroConecta.Infrastructure.Persistence.Seed;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
+var connectionString = builder.Configuration.GetConnectionString("Default")
+    ?? throw new InvalidOperationException(
+        "A string de conexão 'Default' não foi configurada. Veja appsettings.json ou docker/docker-compose.yml.");
+
+builder.Services.AddInfrastructure(connectionString);
+
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    await using var escopo = app.Services.CreateAsyncScope();
+    var contexto = escopo.ServiceProvider.GetRequiredService<AgroConectaDbContext>();
+    await contexto.Database.MigrateAsync();
+    await SeedDados.AplicarAsync(contexto, app.Logger);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
