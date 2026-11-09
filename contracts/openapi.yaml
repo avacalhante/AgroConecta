@@ -1,0 +1,942 @@
+openapi: 3.0.3
+info:
+  title: AgroConecta API
+  version: 0.1.0
+  description: |
+    Contrato inicial da API corporativa do AgroConecta.
+    Cobre autenticação, catálogo, lotes, pedidos, entregas e indicadores.
+    As rotas de cadastro administrativo, rotas e faturamento entram na versão 0.2.
+  contact:
+    name: Equipe AgroConecta
+  license:
+    name: Uso acadêmico
+    url: https://www.unip.br
+servers:
+  - url: http://localhost:5000
+    description: Desenvolvimento local
+  - url: https://api.agroconecta.local
+    description: Staging (exemplo)
+tags:
+  - name: Auth
+    description: Autenticação e sessão
+  - name: Cadastros
+    description: Cadastros administrativos
+  - name: Catálogo
+    description: Produtos disponíveis
+  - name: Lotes
+    description: Lotes de colheita e rastreabilidade
+  - name: Pedidos
+    description: Pedidos B2B
+  - name: Entregas
+    description: Execução logística
+  - name: Indicadores
+    description: Dashboard e relatórios
+  - name: Sistema
+    description: Saúde e metadados da aplicação
+paths:
+  /health:
+    get:
+      tags: [Sistema]
+      summary: Verifica a saúde da aplicação
+      operationId: health
+      security: []
+      responses:
+        '200':
+          description: Aplicação saudável
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  version:
+                    type: string
+                    example: 0.1.0
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '503':
+          description: Aplicação indisponível
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: Autentica usuário
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Renova o par de tokens
+      operationId: refresh
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Tokens renovados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/auth/logout:
+    post:
+      tags: [Auth]
+      summary: Encerra a sessão
+      operationId: logout
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Sessão encerrada
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/me:
+    get:
+      tags: [Auth]
+      summary: Retorna o usuário autenticado
+      operationId: me
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Usuário atual
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/produtos:
+    get:
+      tags: [Catálogo]
+      summary: Lista o catálogo de produtos
+      operationId: listarProdutos
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: ativo
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Lista paginada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProdutoPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Catálogo]
+      summary: Cria um produto
+      operationId: criarProduto
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProdutoRequest'
+      responses:
+        '201':
+          description: Produto criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Produto'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/produtos/{id}:
+    get:
+      tags: [Catálogo]
+      summary: Busca produto por identificador
+      operationId: obterProduto
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Produto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Produto'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/lotes:
+    get:
+      tags: [Lotes]
+      summary: Lista lotes de colheita
+      operationId: listarLotes
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/LoteStatus'
+      responses:
+        '200':
+          description: Lista paginada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LotePage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Lotes]
+      summary: Registra um lote de colheita
+      description: |
+        O `codigoRastreio` é gerado no cliente (UUID). Se já existir,
+        a API retorna 409 e o aplicativo trata como sincronização concluída.
+      operationId: criarLote
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoteRequest'
+      responses:
+        '201':
+          description: Lote criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lote'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Código de rastreio já existente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/lotes/meus:
+    get:
+      tags: [Lotes]
+      summary: Lista os lotes do produtor autenticado
+      operationId: listarMeusLotes
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Lista paginada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LotePage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/lotes/{id}:
+    get:
+      tags: [Lotes]
+      summary: Busca lote por identificador
+      operationId: obterLote
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Lote encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lote'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/pedidos:
+    get:
+      tags: [Pedidos]
+      summary: Lista pedidos
+      description: Comprador vê apenas os próprios pedidos; Admin vê todos.
+      operationId: listarPedidos
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/PedidoStatus'
+      responses:
+        '200':
+          description: Lista paginada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Pedidos]
+      summary: Cria um pedido
+      operationId: criarPedido
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PedidoRequest'
+      responses:
+        '201':
+          description: Pedido criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pedido'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/pedidos/{id}:
+    get:
+      tags: [Pedidos]
+      summary: Busca pedido por identificador
+      operationId: obterPedido
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Pedido encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pedido'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/pedidos/{id}/status:
+    patch:
+      tags: [Pedidos]
+      summary: Altera o status do pedido
+      operationId: alterarStatusPedido
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PedidoStatusRequest'
+      responses:
+        '200':
+          description: Status alterado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pedido'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/entregas/minhas:
+    get:
+      tags: [Entregas]
+      summary: Lista as entregas do motorista autenticado
+      operationId: listarMinhasEntregas
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/EntregaStatus'
+      responses:
+        '200':
+          description: Entregas do motorista
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Entrega'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/entregas/{id}/status:
+    patch:
+      tags: [Entregas]
+      summary: Atualiza o status da entrega
+      description: Operação idempotente. Repetir o mesmo status não gera efeito colateral.
+      operationId: alterarStatusEntrega
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntregaStatusRequest'
+      responses:
+        '200':
+          description: Status atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Entrega'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/entregas/{id}/evidencia:
+    put:
+      tags: [Entregas]
+      summary: Envia ou substitui a evidência da entrega
+      description: Operação idempotente. A última evidência enviada prevalece.
+      operationId: enviarEvidencia
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, latitude, longitude]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                latitude:
+                  type: number
+                  format: double
+                  example: -22.9068
+                longitude:
+                  type: number
+                  format: double
+                  example: -43.1729
+                observacao:
+                  type: string
+                  maxLength: 500
+      responses:
+        '200':
+          description: Evidência registrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Entrega'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/indicadores:
+    get:
+      tags: [Indicadores]
+      summary: Retorna indicadores do dashboard
+      operationId: obterIndicadores
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Indicadores
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Indicadores'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PageSize:
+      name: pageSize
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  responses:
+    BadRequest:
+      description: Requisição inválida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationProblemDetails'
+    Unauthorized:
+      description: Não autenticado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    Forbidden:
+      description: Sem permissão
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    NotFound:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    UnprocessableEntity:
+      description: Regra de negócio violada
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    InternalServerError:
+      description: Erro inesperado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+  schemas:
+    Papel:
+      type: string
+      enum: [Admin, Produtor, Comprador, Motorista]
+    PedidoStatus:
+      type: string
+      enum: [Rascunho, AguardandoAprovacao, Aprovado, EmSeparacao, EmRota, Entregue, Cancelado]
+    EntregaStatus:
+      type: string
+      enum: [Pendente, EmRota, Entregue, Falha, Cancelada]
+    LoteStatus:
+      type: string
+      enum: [Disponivel, Reservado, Esgotado]
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        traceId:
+          type: string
+    ValidationProblemDetails:
+      allOf:
+        - $ref: '#/components/schemas/ProblemDetails'
+        - type: object
+          properties:
+            errors:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+    LoginRequest:
+      type: object
+      required: [email, senha]
+      properties:
+        email:
+          type: string
+          format: email
+        senha:
+          type: string
+          format: password
+          minLength: 8
+    LoginResponse:
+      type: object
+      required: [accessToken, refreshToken, expiresIn, usuario]
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          description: Validade do access token em segundos
+          example: 900
+        usuario:
+          $ref: '#/components/schemas/Usuario'
+    RefreshRequest:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken:
+          type: string
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        email:
+          type: string
+          format: email
+        papel:
+          $ref: '#/components/schemas/Papel'
+        ativo:
+          type: boolean
+    Produto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        categoria:
+          type: string
+        unidade:
+          type: string
+          example: kg
+        precoBase:
+          type: number
+          format: double
+          example: 8.5
+        ativo:
+          type: boolean
+    ProdutoRequest:
+      type: object
+      required: [nome, categoria, unidade, precoBase]
+      properties:
+        nome:
+          type: string
+          maxLength: 120
+        categoria:
+          type: string
+          maxLength: 80
+        unidade:
+          type: string
+          maxLength: 20
+        precoBase:
+          type: number
+          format: double
+          minimum: 0
+    ProdutoPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Produto'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+    Lote:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        produtorId:
+          type: integer
+          format: int64
+        produtoId:
+          type: integer
+          format: int64
+        produtoNome:
+          type: string
+        codigoRastreio:
+          type: string
+          format: uuid
+        dataColheita:
+          type: string
+          format: date
+        quantidade:
+          type: number
+          format: double
+        status:
+          $ref: '#/components/schemas/LoteStatus'
+        criadoEm:
+          type: string
+          format: date-time
+    LoteRequest:
+      type: object
+      required: [produtoId, codigoRastreio, dataColheita, quantidade]
+      properties:
+        produtoId:
+          type: integer
+          format: int64
+        codigoRastreio:
+          type: string
+          format: uuid
+          description: Gerado no cliente para permitir sincronização idempotente.
+        dataColheita:
+          type: string
+          format: date
+        quantidade:
+          type: number
+          format: double
+          exclusiveMinimum: true
+          minimum: 0
+    LotePage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lote'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+    Pedido:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        compradorId:
+          type: integer
+          format: int64
+        compradorNome:
+          type: string
+        dataPedido:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/PedidoStatus'
+        valorTotal:
+          type: number
+          format: double
+        enderecoEntrega:
+          type: string
+        itens:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemPedido'
+    ItemPedido:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        produtoId:
+          type: integer
+          format: int64
+        produtoNome:
+          type: string
+        loteId:
+          type: integer
+          format: int64
+        quantidade:
+          type: number
+          format: double
+        precoUnitario:
+          type: number
+          format: double
+        subtotal:
+          type: number
+          format: double
+    PedidoRequest:
+      type: object
+      required: [enderecoEntrega, itens]
+      properties:
+        enderecoEntrega:
+          type: string
+          maxLength: 300
+        itens:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ItemPedidoRequest'
+    ItemPedidoRequest:
+      type: object
+      required: [produtoId, quantidade, precoUnitario]
+      properties:
+        produtoId:
+          type: integer
+          format: int64
+        loteId:
+          type: integer
+          format: int64
+          nullable: true
+        quantidade:
+          type: number
+          format: double
+          exclusiveMinimum: true
+          minimum: 0
+        precoUnitario:
+          type: number
+          format: double
+          minimum: 0
+    PedidoPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pedido'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+    PedidoStatusRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: '#/components/schemas/PedidoStatus'
+        observacao:
+          type: string
+          maxLength: 500
+    Entrega:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        pedidoId:
+          type: integer
+          format: int64
+        status:
+          $ref: '#/components/schemas/EntregaStatus'
+        dataPrevista:
+          type: string
+          format: date
+        dataRealizada:
+          type: string
+          format: date-time
+          nullable: true
+        latitude:
+          type: number
+          format: double
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          nullable: true
+        fotoUrl:
+          type: string
+          format: uri
+          nullable: true
+        observacao:
+          type: string
+          nullable: true
+    EntregaStatusRequest:
+      type: object
+      required: [status, ocorridoEm]
+      properties:
+        status:
+          $ref: '#/components/schemas/EntregaStatus'
+        ocorridoEm:
+          type: string
+          format: date-time
+        observacao:
+          type: string
+          maxLength: 500
+    Indicadores:
+      type: object
+      properties:
+        pedidosMes:
+          type: integer
+        entregasNoPrazoPercentual:
+          type: number
+          format: double
+        perdasPercentual:
+          type: number
+          format: double
+        produtoresAtivos:
+          type: integer
+        cooperativasAtivas:
+          type: integer
+        entregasComEvidenciaPercentual:
+          type: number
+          format: double
+        telasAcessiveisPercentual:
+          type: number
+          format: double
