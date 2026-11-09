@@ -659,6 +659,8 @@ O texto é escrito em `documento/pim.md` (versionável) e diagramado em `documen
 
 ### 10.1 Visão semanal
 
+> O cronograma-base de 10 semanas assume 3–4 pessoas ou cerca de 3 dias úteis por semana. Com 2 pessoas, estender para 12–14 semanas ou aplicar o plano de corte da seção 14.
+
 | Semana | Parte A | Parte B | Documentação | Marco |
 |---|---|---|---|---|
 | **0** | A0 + contrato v0.1 | B0 | D0 | **M0** — Repositório, contrato e template |
