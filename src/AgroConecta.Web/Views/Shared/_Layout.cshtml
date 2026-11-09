@@ -1,47 +1,75 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - AgroConecta.Web</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] · AgroConecta</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/AgroConecta.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
+    <a class="visually-hidden-focusable p-2 bg-white" href="#conteudo">Pular para o conteúdo</a>
+
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-success" aria-label="Navegação principal">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">AgroConecta.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand fw-semibold" asp-controller="Home" asp-action="Index">AgroConecta</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal"
+                        aria-controls="menuPrincipal" aria-expanded="false" aria-label="Abrir menu">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+
+                <div class="collapse navbar-collapse" id="menuPrincipal">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Painel</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Produtores" asp-action="Index">Produtores</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Cooperativas" asp-action="Index">Cooperativas</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="ProdutosWeb" asp-action="Index">Produtos</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="PedidosWeb" asp-action="Index">Pedidos</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="EntregasWeb" asp-action="Index">Entregas</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Faturas" asp-action="Index">Faturas</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Inclusao" asp-action="Index">Inclusão</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Usuarios" asp-action="Index">Usuários</a></li>
+                        </ul>
+
+                        <div class="d-flex align-items-center gap-3 text-white">
+                            <span class="small">
+                                @User.Identity.Name
+                                <span class="badge bg-light text-success ms-1">@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</span>
+                            </span>
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-light">Sair</button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">Entrar</a>
+                            </li>
+                        </ul>
+                    }
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - AgroConecta.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <main id="conteudo" role="main" class="container pb-5">
+        @RenderBody()
+    </main>
+
+    <footer class="border-top footer text-muted bg-white">
+        <div class="container py-3 small d-flex justify-content-between flex-wrap gap-2">
+            <span>&copy; 2026 AgroConecta · PIM IV</span>
+            <span>Protótipo acadêmico — dados fictícios de demonstração.</span>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

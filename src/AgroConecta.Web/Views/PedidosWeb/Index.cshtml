@@ -1,0 +1,72 @@
+@model AgroConecta.Domain.Common.ResultadoPaginado<AgroConecta.Application.Pedidos.PedidoDto>
+@{
+    ViewData["Title"] = "Pedidos";
+    var statusFiltro = ViewData["Status"] as AgroConecta.Domain.Enums.StatusPedido?;
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 mb-3">
+    <div>
+        <h1 class="h3 mb-1">Pedidos</h1>
+        <p class="text-muted mb-0">Compras realizadas na plataforma.</p>
+    </div>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-sm-5 col-md-4">
+        <label for="status" class="form-label">Status</label>
+        <select id="status" name="status" class="form-select">
+            <option value="">Todos</option>
+            @foreach (var status in Enum.GetValues<AgroConecta.Domain.Enums.StatusPedido>())
+            {
+                <option value="@status" selected="@(statusFiltro == status ? "selected" : null)">@status</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-success">Filtrar</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
+    </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <caption class="visually-hidden">Lista de pedidos</caption>
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Comprador</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="text-center">Itens</th>
+                    <th scope="col" class="text-end">Total</th>
+                    <th scope="col" class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pedido in Model.Itens)
+                {
+                    <tr>
+                        <td>@pedido.Id</td>
+                        <td>@pedido.CompradorNome</td>
+                        <td>@pedido.DataPedido.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                        <td><span class="badge @Badges.Pedido(pedido.Status)">@pedido.Status</span></td>
+                        <td class="text-center">@pedido.Itens.Count</td>
+                        <td class="text-end">@pedido.ValorTotal.ToString("C")</td>
+                        <td class="text-end">
+                            <a asp-action="Detalhe" asp-route-id="@pedido.Id" class="btn btn-sm btn-outline-success">Detalhe</a>
+                        </td>
+                    </tr>
+                }
+                @if (Model.Itens.Count == 0)
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-4">Nenhum pedido encontrado.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center small text-muted">
+        <span>@Model.Total pedido(s)</span>
+        <span>Página @Model.Pagina</span>
+    </div>
+</div>

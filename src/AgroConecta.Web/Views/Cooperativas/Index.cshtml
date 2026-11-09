@@ -1,0 +1,61 @@
+@model IReadOnlyList<AgroConecta.Application.Consultas.CooperativaResumo>
+@{
+    ViewData["Title"] = "Cooperativas";
+    var ehAdmin = User.IsInRole(nameof(AgroConecta.Domain.Enums.PapelUsuario.Admin));
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 mb-3">
+    <div>
+        <h1 class="h3 mb-1">Cooperativas</h1>
+        <p class="text-muted mb-0">Organizações parceiras da agricultura familiar.</p>
+    </div>
+    @if (ehAdmin)
+    {
+        <a asp-action="Criar" class="btn btn-success">Nova cooperativa</a>
+    }
+</div>
+
+@if (TempData["Mensagem"] is string mensagem)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @mensagem
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+}
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <caption class="visually-hidden">Lista de cooperativas</caption>
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Cidade/UF</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col" class="text-center">Produtores</th>
+                    <th scope="col">Situação</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cooperativa in Model)
+                {
+                    <tr>
+                        <td><strong>@cooperativa.Nome</strong></td>
+                        <td>@cooperativa.Cidade/@cooperativa.UF</td>
+                        <td>@cooperativa.Tipo</td>
+                        <td class="text-center">@cooperativa.QuantidadeProdutores</td>
+                        <td>
+                            <span class="badge @(cooperativa.Ativa ? "bg-success" : "bg-secondary")">
+                                @(cooperativa.Ativa ? "Ativa" : "Inativa")
+                            </span>
+                        </td>
+                    </tr>
+                }
+                @if (Model.Count == 0)
+                {
+                    <tr><td colspan="5" class="text-center text-muted py-4">Nenhuma cooperativa cadastrada.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

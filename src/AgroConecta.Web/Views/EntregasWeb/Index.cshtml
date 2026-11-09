@@ -1,0 +1,63 @@
+@model IReadOnlyList<AgroConecta.Application.Consultas.EntregaResumo>
+@{
+    ViewData["Title"] = "Entregas e rotas";
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 mb-3">
+    <div>
+        <h1 class="h3 mb-1">Entregas e rotas</h1>
+        <p class="text-muted mb-0">Acompanhamento logístico das entregas programadas.</p>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <caption class="visually-hidden">Lista de entregas</caption>
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Pedido</th>
+                    <th scope="col">Comprador</th>
+                    <th scope="col">Motorista</th>
+                    <th scope="col">Prevista</th>
+                    <th scope="col">Realizada</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Evidência</th>
+                    <th scope="col" class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entrega in Model)
+                {
+                    <tr>
+                        <td>@entrega.Id</td>
+                        <td><a asp-controller="PedidosWeb" asp-action="Detalhe" asp-route-id="@entrega.PedidoId">@entrega.PedidoId</a></td>
+                        <td>@entrega.Comprador</td>
+                        <td>@(entrega.Motorista ?? "—")</td>
+                        <td>@entrega.DataPrevista.ToString("dd/MM/yyyy")</td>
+                        <td>@(entrega.DataRealizada?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "—")</td>
+                        <td><span class="badge @Badges.Entrega(entrega.Status)">@entrega.Status</span></td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(entrega.FotoUrl))
+                            {
+                                <a href="@entrega.FotoUrl" target="_blank" rel="noopener" class="small">Ver foto</a>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">Sem foto</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a asp-controller="PedidosWeb" asp-action="Detalhe" asp-route-id="@entrega.PedidoId" class="btn btn-sm btn-outline-success">Pedido</a>
+                        </td>
+                    </tr>
+                }
+                @if (Model.Count == 0)
+                {
+                    <tr><td colspan="9" class="text-center text-muted py-4">Nenhuma entrega registrada.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

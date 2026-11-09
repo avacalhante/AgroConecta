@@ -1,8 +1,139 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model AgroConecta.Web.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Painel";
+    var indicadores = Model.Indicadores;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 mb-4">
+    <div>
+        <h1 class="h3 mb-1">Painel administrativo</h1>
+        <p class="text-muted mb-0">Visão consolidada da operação da agricultura familiar.</p>
+    </div>
+    <a asp-controller="Inclusao" asp-action="Index" class="btn btn-outline-success">Painel de inclusão</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Pedidos no mês</p>
+                <p class="display-6 mb-0">@indicadores.PedidosMes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Entregas no prazo</p>
+                <p class="display-6 mb-0">@indicadores.EntregasNoPrazoPercentual%</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Entregas com evidência</p>
+                <p class="display-6 mb-0">@indicadores.EntregasComEvidenciaPercentual%</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Produtores ativos</p>
+                <p class="display-6 mb-0">@indicadores.ProdutoresAtivos</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Cooperativas ativas</p>
+                <p class="h2 mb-0">@indicadores.CooperativasAtivas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm @(Model.ProdutoresAguardando > 0 ? "border-start border-4 border-warning" : "")">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Produtores aguardando aprovação</p>
+                <p class="h2 mb-0">@Model.ProdutoresAguardando</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Faturas em aberto</p>
+                <p class="h2 mb-0">@Model.FaturasPendentes</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Pedidos recentes</h2>
+                <a asp-controller="PedidosWeb" asp-action="Index" class="btn btn-sm btn-outline-success">Ver todos</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <caption class="visually-hidden">Pedidos recentes</caption>
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Comprador</th>
+                            <th scope="col">Status</th>
+                            <th scope="col" class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pedido in Model.PedidosRecentes)
+                        {
+                            <tr>
+                                <td><a asp-controller="PedidosWeb" asp-action="Detalhe" asp-route-id="@pedido.Id">@pedido.Id</a></td>
+                                <td>@pedido.CompradorNome</td>
+                                <td><span class="badge @Badges.Pedido(pedido.Status)">@pedido.Status</span></td>
+                                <td class="text-end">@pedido.ValorTotal.ToString("C")</td>
+                            </tr>
+                        }
+                        @if (Model.PedidosRecentes.Count == 0)
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-4">Nenhum pedido registrado.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Entregas próximas</h2>
+                <a asp-controller="EntregasWeb" asp-action="Index" class="btn btn-sm btn-outline-success">Ver todas</a>
+            </div>
+            <ul class="list-group list-group-flush">
+                @foreach (var entrega in Model.EntregasRecentes)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center gap-2">
+                        <span>
+                            Pedido @entrega.PedidoId · @entrega.Comprador
+                            <small class="d-block text-muted">Prevista para @entrega.DataPrevista.ToString("dd/MM/yyyy")</small>
+                        </span>
+                        <span class="badge @Badges.Entrega(entrega.Status)">@entrega.Status</span>
+                    </li>
+                }
+                @if (Model.EntregasRecentes.Count == 0)
+                {
+                    <li class="list-group-item text-center text-muted py-4">Nenhuma entrega registrada.</li>
+                }
+            </ul>
+        </div>
+    </div>
 </div>

@@ -1,0 +1,101 @@
+@model AgroConecta.Web.Models.InclusaoViewModel
+@{
+    ViewData["Title"] = "Painel de inclusão";
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 mb-4">
+    <div>
+        <h1 class="h3 mb-1">Painel de inclusão e acessibilidade</h1>
+        <p class="text-muted mb-0">Indicadores de inclusão digital da agricultura familiar.</p>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Produtores cadastrados</p>
+                <p class="display-6 mb-0">@Model.TotalProdutores</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Aprovados</p>
+                <p class="display-6 mb-0">@Model.Aprovados</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Aguardando aprovação</p>
+                <p class="display-6 mb-0">@Model.Pendentes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Telas acessíveis</p>
+                <p class="display-6 mb-0">@Model.Indicadores.TelasAcessiveisPercentual%</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h2 class="h5 mb-0">Produtores por comunidade</h2>
+            </div>
+            <ul class="list-group list-group-flush">
+                @foreach (var (comunidade, quantidade) in Model.PorComunidade.OrderByDescending(item => item.Value))
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>@comunidade</span>
+                        <span class="badge bg-success rounded-pill">@quantidade</span>
+                    </li>
+                }
+                @if (Model.PorComunidade.Count == 0)
+                {
+                    <li class="list-group-item text-center text-muted py-4">Nenhum produtor cadastrado.</li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h2 class="h5 mb-0">Acessibilidade do sistema</h2>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">
+                    As telas seguem as diretrizes WCAG 2.1 nível AA: navegação por teclado,
+                    textos alternativos, contraste adequado e rótulos acessíveis em formulários.
+                </p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Navegação por teclado e link \"pular para o conteúdo\"</span>
+                        <span class="badge bg-success">Conforme</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Rótulos e descrições em campos de formulário</span>
+                        <span class="badge bg-success">Conforme</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Contraste de cores e foco visível</span>
+                        <span class="badge bg-success">Conforme</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Tabelas com cabeçalho e legenda</span>
+                        <span class="badge bg-success">Conforme</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

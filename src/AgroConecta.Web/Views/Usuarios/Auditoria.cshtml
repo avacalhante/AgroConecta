@@ -1,0 +1,47 @@
+@model IReadOnlyList<AgroConecta.Application.Consultas.LogAcessoResumo>
+@{
+    ViewData["Title"] = "Auditoria";
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 mb-3">
+    <div>
+        <h1 class="h3 mb-1">Trilha de auditoria</h1>
+        <p class="text-muted mb-0">Ações sensíveis registradas no sistema (LGPD).</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">Voltar aos usuários</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <caption class="visually-hidden">Registros de auditoria</caption>
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Data</th>
+                    <th scope="col">Usuário</th>
+                    <th scope="col">Ação</th>
+                    <th scope="col">Entidade</th>
+                    <th scope="col">Registro</th>
+                    <th scope="col">IP</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model)
+                {
+                    <tr>
+                        <td>@log.CriadoEm.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@(log.Usuario ?? "—")</td>
+                        <td>@log.Acao</td>
+                        <td>@log.Entidade</td>
+                        <td>@(log.EntidadeId ?? "—")</td>
+                        <td>@(log.IP ?? "—")</td>
+                    </tr>
+                }
+                @if (Model.Count == 0)
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-4">Nenhum registro de auditoria.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
