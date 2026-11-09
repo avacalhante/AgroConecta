@@ -38,6 +38,8 @@ public static class DependencyInjection
         services.AddScoped<IIndicadoresRepositorio, IndicadoresRepositorio>();
         services.AddScoped<IRelatoriosRepositorio, RelatoriosRepositorio>();
         services.AddScoped<IConsultasWebRepositorio, ConsultasWebRepositorio>();
+        services.AddScoped<IRotaRepositorio, RotaRepositorio>();
+        services.AddScoped<IFaturaRepositorio, FaturaRepositorio>();
         services.AddScoped<IUnidadeDeTrabalho, UnidadeDeTrabalho>();
 
         services.AddSingleton<ISenhaHasher, SenhaHasherAdapter>();
