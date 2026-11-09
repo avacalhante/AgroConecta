@@ -166,6 +166,12 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Comprar", politica =>
         politica.RequireRole(nameof(PapelUsuario.Admin), nameof(PapelUsuario.Comprador)));
 
+    options.AddPolicy("OperarPedidos", politica =>
+        politica.RequireRole(
+            nameof(PapelUsuario.Admin),
+            nameof(PapelUsuario.Produtor),
+            nameof(PapelUsuario.Motorista)));
+
     options.AddPolicy("Entregar", politica =>
         politica.RequireRole(nameof(PapelUsuario.Admin), nameof(PapelUsuario.Motorista)));
 });
