@@ -38,10 +38,13 @@ docs/        Manual do PIM e escopo de referência
 ## Como rodar (a partir da fundação)
 
 ```bash
+# 0. Ferramentas locais (EF Core)
+dotnet tool restore
+
 # 1. Banco
 docker compose -f docker/docker-compose.yml up -d
 
-# 2. Migrations
+# 2. Migrations e seed de desenvolvimento
 dotnet ef database update -p src/AgroConecta.Infrastructure -s src/AgroConecta.Web
 
 # 3. Web/API
@@ -55,12 +58,26 @@ npx expo start
 
 A API expõe Swagger em `http://localhost:5000/swagger` e health em `http://localhost:5000/health`.
 
+### Banco de dados
+
+- SQL Server 2022 em container, banco `AgroConecta`, porta `1433`.
+- Senha local do usuário `sa`: `AgroConecta@2026` (padrão de desenvolvimento, veja `docker/.env.example`).
+- A string de conexão fica em `src/AgroConecta.Web/appsettings.json` e pode ser sobrescrita por `ConnectionStrings__Default`.
+- Em `Development`, a aplicação aplica migrations e o seed automaticamente na inicialização.
+- Alternativa manual (banco limpo): `db/script-completo.sql` cria tabelas, procedures, triggers e carga.
+
+```bash
+# recriar o script completo depois de alterar o modelo
+./scripts/gerar-script-banco.sh
+```
+
 ## Usuários de desenvolvimento
 
 | E-mail | Papel | Senha |
 |---|---|---|
 | `admin@agroconecta.local` | Admin | `Admin@123` |
 | `produtor@agroconecta.local` | Produtor | `Produtor@123` |
+| `maria@agroconecta.local` | Produtor | `Produtor@123` |
 | `comprador@agroconecta.local` | Comprador | `Comprador@123` |
 | `motorista@agroconecta.local` | Motorista | `Motorista@123` |
 
