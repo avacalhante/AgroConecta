@@ -18,11 +18,14 @@ coverage/
 node_modules/
 .expo/
 .expo-shared/
-dist/
+mobile/dist/
 web-build/
 *.tsbuildinfo
 mobile/android/
 mobile/ios/
+
+# Bibliotecas de terceiros versionadas pelo template da Web
+!src/AgroConecta.Web/wwwroot/lib/**/dist/
 
 # Ambiente e segredos
 .env
