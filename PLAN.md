@@ -17,7 +17,7 @@
 | `evidencias/` | Capturas, vídeos, diagramas, scripts e relatórios (a criar). |
 | `gestao/` | Backlog, sprints, Kanban e riscos (a criar). |
 
-> **Atenção:** `docs/` está fora do versionamento por configuração local (`.git/info/exclude`). O PIM final e as evidências devem ficar em `documento/` e `evidencias/`, que serão versionados.
+> **Atenção:** O PIM final e as evidências devem ficar em `documento/` e `evidencias/`, que serão versionados.
 
 ---
 
@@ -108,8 +108,6 @@ Resultado esperado:
 /home/v/Projetos/work/PIM_4-mobile   feat/mobile-app
 ```
 
-> Os arquivos de `docs/` não são versionados. Nos worktrees, consulte o manual pelo caminho absoluto `/home/v/Projetos/work/PIM_4/docs/manual.md` ou copie localmente sem commitar.
-
 ### 3.4 Ownership de arquivos
 
 | Caminho | Dono | Regra |
@@ -119,7 +117,6 @@ Resultado esperado:
 | `contracts/` | Integração (main) | Alterações via main; features apenas consomem |
 | `documento/`, `evidencias/`, `gestao/` | Documentação (main) | Alimentados pelas duas partes |
 | `README.md`, `AGENTS.md`, `PLAN.md`, `.gitignore` | Integração (main) | Alterações via main |
-| `docs/` | Referência local | Não versionado; não editar sem necessidade |
 
 ### 3.5 Contrato primeiro
 
