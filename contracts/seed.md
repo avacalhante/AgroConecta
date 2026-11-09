@@ -8,6 +8,7 @@ Dados mínimos para desenvolvimento, testes manuais e demonstração. **Nunca us
 |---|---|---|---|
 | Ana Administradora | `admin@agroconecta.local` | `Admin` | `Admin@123` |
 | Paulo Produtor | `produtor@agroconecta.local` | `Produtor` | `Produtor@123` |
+| Maria Quilombola | `maria@agroconecta.local` | `Produtor` | `Produtor@123` |
 | Carla Compradora | `comprador@agroconecta.local` | `Comprador` | `Comprador@123` |
 | Marcos Motorista | `motorista@agroconecta.local` | `Motorista` | `Motorista@123` |
 
@@ -46,8 +47,8 @@ Dados mínimos para desenvolvimento, testes manuais e demonstração. **Nunca us
 
 | Comprador | Status | Valor | Itens |
 |---|---|---:|---|
-| Carla Compradora | `Aprovado` | 425,00 | 50 kg de tomate |
-| Carla Compradora | `AguardandoAprovacao` | 320,00 | 100 unidades de alface |
+| Carla Compradora | `EmRota` | 425,00 | 50 kg de tomate |
+| Carla Compradora | `Aprovado` | 320,00 | 100 unidades de alface |
 
 ## Rota e entregas
 
