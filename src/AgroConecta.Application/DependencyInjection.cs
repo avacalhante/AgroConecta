@@ -15,10 +15,12 @@ public static class DependencyInjection
 
         services.AddScoped<ICasoDeUso<ListarProdutosConsulta, Domain.Common.ResultadoPaginado<ProdutoDto>>, ListarProdutosCasoDeUso>();
         services.AddScoped<ICasoDeUso<CriarProdutoComando, ProdutoDto>, CriarProdutoCasoDeUso>();
+        services.AddScoped<ICasoDeUso<int, ProdutoDto>, ObterProdutoCasoDeUso>();
 
         services.AddScoped<ICasoDeUso<ListarPedidosConsulta, Domain.Common.ResultadoPaginado<PedidoDto>>, ListarPedidosCasoDeUso>();
         services.AddScoped<ICasoDeUso<CriarPedidoComando, PedidoDto>, CriarPedidoCasoDeUso>();
         services.AddScoped<ICasoDeUso<AlterarStatusPedidoComando, PedidoDto>, AlterarStatusPedidoCasoDeUso>();
+        services.AddScoped<ICasoDeUso<int, PedidoDto>, ObterPedidoCasoDeUso>();
 
         return services;
     }
