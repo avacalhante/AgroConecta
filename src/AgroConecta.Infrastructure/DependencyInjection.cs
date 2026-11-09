@@ -1,6 +1,7 @@
 using AgroConecta.Application.Auth;
 using AgroConecta.Application.Consultas;
 using AgroConecta.Application.Indicadores;
+using AgroConecta.Application.Relatorios;
 using AgroConecta.Domain.Abstractions;
 using AgroConecta.Infrastructure.Persistence;
 using AgroConecta.Infrastructure.Repositorios;
@@ -35,6 +36,7 @@ public static class DependencyInjection
         services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
         services.AddScoped<IEntregaRepositorio, EntregaRepositorio>();
         services.AddScoped<IIndicadoresRepositorio, IndicadoresRepositorio>();
+        services.AddScoped<IRelatoriosRepositorio, RelatoriosRepositorio>();
         services.AddScoped<IConsultasWebRepositorio, ConsultasWebRepositorio>();
         services.AddScoped<IUnidadeDeTrabalho, UnidadeDeTrabalho>();
 
