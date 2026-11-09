@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using AgroConecta.Application;
 using AgroConecta.Domain.Enums;
 using AgroConecta.Infrastructure;
@@ -8,6 +9,7 @@ using AgroConecta.Infrastructure.Seguranca;
 using AgroConecta.Web.Api;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -21,6 +23,23 @@ builder.Services
 builder.Services.AddApplication();
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+// Limite por IP nas rotas de login (proteção contra força bruta).
+// Nos testes automatizados o limite é ampliado para não interferir na suíte.
+var limiteLoginPorMinuto = builder.Environment.IsEnvironment("Testing") ? 10_000 : 10;
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("login", contexto =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            contexto.Connection.RemoteIpAddress?.ToString() ?? "anonimo",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = limiteLoginPorMinuto,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+            }));
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -189,6 +208,34 @@ if (app.Environment.IsDevelopment())
 
 app.UseExceptionHandler();
 
+// Cabeçalhos de segurança (OWASP) aplicados a todas as respostas.
+app.Use(async (contexto, proximo) =>
+{
+    var cabecalhos = contexto.Response.Headers;
+
+    cabecalhos["X-Content-Type-Options"] = "nosniff";
+    cabecalhos["X-Frame-Options"] = "DENY";
+    cabecalhos["Referrer-Policy"] = "no-referrer";
+    cabecalhos["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()";
+
+    // A UI do Swagger usa scripts/estilos embutidos; o CSP restritivo é omitido nela.
+    if (!contexto.Request.Path.StartsWithSegments("/swagger"))
+    {
+        cabecalhos["Content-Security-Policy"] =
+            "default-src 'self'; " +
+            "img-src 'self' data:; " +
+            "style-src 'self' 'unsafe-inline'; " +
+            "script-src 'self'; " +
+            "font-src 'self'; " +
+            "connect-src 'self'; " +
+            "frame-ancestors 'none'; " +
+            "base-uri 'self'; " +
+            "form-action 'self'";
+    }
+
+    await proximo();
+});
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
@@ -203,6 +250,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

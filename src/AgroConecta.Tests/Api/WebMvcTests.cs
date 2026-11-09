@@ -36,6 +36,31 @@ public class WebMvcTests(ApiFactory fabrica) : IClassFixture<ApiFactory>
     }
 
     [Fact]
+    public async Task Respostas_incluem_cabecalhos_de_seguranca()
+    {
+        var cliente = fabrica.CreateClient();
+
+        var resposta = await cliente.GetAsync("/Account/Login");
+
+        Assert.Equal("nosniff", resposta.Headers.GetValues("X-Content-Type-Options").Single());
+        Assert.Equal("DENY", resposta.Headers.GetValues("X-Frame-Options").Single());
+        Assert.Contains("default-src 'self'", resposta.Headers.GetValues("Content-Security-Policy").Single());
+    }
+
+    [Fact]
+    public async Task Pagina_de_privacidade_abre_para_anonimo()
+    {
+        var cliente = fabrica.CreateClient();
+
+        var resposta = await cliente.GetAsync("/Home/Privacidade");
+
+        Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
+
+        var html = await resposta.Content.ReadAsStringAsync();
+        Assert.Contains("LGPD", html);
+    }
+
+    [Fact]
     public async Task Login_com_cookie_permite_acessar_o_painel()
     {
         var cliente = fabrica.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions

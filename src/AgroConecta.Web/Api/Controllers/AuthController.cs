@@ -4,6 +4,7 @@ using AgroConecta.Application.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace AgroConecta.Web.Api.Controllers;
 
@@ -18,6 +19,7 @@ public class AuthController(
     /// <summary>Autentica o usuário e devolve o par de tokens.</summary>
     [HttpPost("auth/login")]
     [AllowAnonymous]
+    [EnableRateLimiting("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
