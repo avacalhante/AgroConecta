@@ -24,6 +24,8 @@ export type MetodoHttp = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type OpcoesRequisicao = {
   metodo?: MetodoHttp;
   corpo?: unknown;
+  /** Corpo multipart; o `fetch` define o boundary do Content-Type. */
+  formData?: FormData;
   token?: string;
   timeoutMs?: number;
 };
@@ -79,17 +81,23 @@ export async function requisitar<T>(
     () => controlador.abort(),
     opcoes.timeoutMs ?? apiConfig.timeoutMs,
   );
-  const temCorpo = opcoes.corpo !== undefined;
+  const temJson = opcoes.corpo !== undefined;
+  const temFormulario = opcoes.formData !== undefined;
+  const temCorpo = temJson || temFormulario;
 
   try {
     const resposta = await fetch(urlCompleta(caminho), {
       method: opcoes.metodo ?? 'GET',
       headers: {
         Accept: 'application/json',
-        ...(temCorpo ? { 'Content-Type': 'application/json' } : {}),
+        ...(temJson ? { 'Content-Type': 'application/json' } : {}),
         ...(opcoes.token ? { Authorization: `Bearer ${opcoes.token}` } : {}),
       },
-      body: temCorpo ? JSON.stringify(opcoes.corpo) : undefined,
+      body: temFormulario
+        ? opcoes.formData
+        : temCorpo
+          ? JSON.stringify(opcoes.corpo)
+          : undefined,
       signal: controlador.signal,
     });
 

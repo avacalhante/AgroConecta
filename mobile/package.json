@@ -42,6 +42,7 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
+    "api:types": "npx --yes openapi-typescript@7.13.0 ../contracts/openapi.yaml -o src/types/api.d.ts",
     "check": "npm run lint && npm run typecheck && npm test"
   },
   "private": true

@@ -32,6 +32,7 @@ cp .env.example .env
 | Variável | Uso |
 |---|---|
 | `EXPO_PUBLIC_API_URL` | URL base da API, ex.: `http://localhost:5000/api/v1` |
+| `EXPO_PUBLIC_API_MOCK` | `true` usa o servidor fake em memória, sem API |
 
 Em dispositivo físico, use o IP da máquina na rede local (`http://192.168.0.10:5000/api/v1`). `localhost` no aparelho aponta para o próprio aparelho.
 
@@ -74,8 +75,21 @@ src/
 - O logout chama `POST /auth/logout` (melhor esforço) e sempre limpa a sessão local.
 
 O cliente HTTP usa `fetch` estruturado em `src/api/http.ts`, com `AbortController` para
-_timeout_ e normalização de erros RFC 7807 em `ApiError`. A camada completa de retry,
-interceptors e mock entra na tarefa B3.
+_timeout_ e normalização de erros RFC 7807 em `ApiError`. O token é injetado pelos
+serviços de recurso e o 401 é tratado por `executarAutenticado`; retry com backoff entra
+na tarefa B6.
+
+## Cliente de API e mock
+
+- `src/api/http.ts`: requisição JSON ou multipart, timeout e `ApiError` com status e
+  `errors` por campo.
+- `src/api/lotes.ts`, `entregas.ts`, `produtos.ts` e `indicadores.ts`: serviços tipados,
+  sempre recebendo o access token.
+- `src/api/mock/servidorFake.ts`: usuários do seed, lotes, entregas, produtos e indicadores
+  em memória. Ative com `EXPO_PUBLIC_API_MOCK=true` para desenvolver sem a API.
+- Erros seguem `contracts/errors.md`: `400` mantém mensagens por campo; `401` renova ou
+  encerra a sessão; `403`/`422` não são repetidos; `409` ao criar lote é sucesso;
+  `5xx`/rede ficam como `ApiError` com `status` 0.
 
 ## Design system
 
@@ -105,5 +119,12 @@ Ver `../contracts/seed.md`. Exemplo: `produtor@agroconecta.local` / `Produtor@12
 ## Tipos da API
 
 ```bash
-npx openapi-typescript ../contracts/openapi.yaml -o src/types/api.d.ts
+npm run api:types
 ```
+
+O comando gera `src/types/api.d.ts` a partir de `../contracts/openapi.yaml`. Esse arquivo é
+somente referência do contrato: como o OpenAPI não marca propriedades como obrigatórias,
+os tipos usados em runtime ficam em `src/api/tipos.ts`, com os campos que o app espera.
+
+`openapi-typescript` 7.13 declara peer `TypeScript ^5` e o projeto usa TypeScript 6; por isso
+o script usa `npx` com versão fixada em vez de uma dependência de desenvolvimento.
