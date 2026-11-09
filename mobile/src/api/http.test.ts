@@ -1,4 +1,4 @@
-import { ApiError, requisitar } from './http';
+import { ApiError, erroDefinitivo, requisitar } from './http';
 
 type RespostaFake = {
   ok: boolean;
@@ -119,6 +119,16 @@ describe('requisitar', () => {
     await expect(
       requisitar('/auth/logout', { metodo: 'POST', token: 'abc' }),
     ).resolves.toBeUndefined();
+  });
+
+  it('classifica erros definitivos e temporários', () => {
+    expect(erroDefinitivo(new ApiError(400, 'inválido'))).toBe(true);
+    expect(erroDefinitivo(new ApiError(403, 'sem permissão'))).toBe(true);
+    expect(erroDefinitivo(new ApiError(404, 'não encontrado'))).toBe(true);
+    expect(erroDefinitivo(new ApiError(422, 'regra'))).toBe(true);
+    expect(erroDefinitivo(new ApiError(401, 'sessão'))).toBe(false);
+    expect(erroDefinitivo(new ApiError(500, 'servidor'))).toBe(false);
+    expect(erroDefinitivo(new ApiError(0, 'rede'))).toBe(false);
   });
 
   it('envia multipart sem definir Content-Type manualmente', async () => {

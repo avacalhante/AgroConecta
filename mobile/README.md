@@ -77,8 +77,8 @@ src/
 
 O cliente HTTP usa `fetch` estruturado em `src/api/http.ts`, com `AbortController` para
 _timeout_ e normalização de erros RFC 7807 em `ApiError`. O token é injetado pelos
-serviços de recurso e o 401 é tratado por `executarAutenticado`; retry com backoff entra
-na tarefa B6.
+serviços de recurso e o 401 é tratado por `executarAutenticado`. O retry com backoff é
+feito pela fila de sincronização, descrita abaixo.
 
 ## Cliente de API e mock
 
@@ -100,8 +100,8 @@ na tarefa B6.
 - `sincronizarLotes` envia a fila, trata `409` como já sincronizado e depois puxa
   `/lotes/meus` e `/produtos` para atualizar o banco local.
 - A lista lê sempre do SQLite e mostra “Pendente de envio” enquanto o lote não sobe.
-- A sincronização roda ao focar a aba de lotes e no gesto de puxar para atualizar.
-  Retry com backoff, listener de reconexão e conflitos visíveis entram na B6.
+- A sincronização roda ao focar a aba de lotes, no gesto de puxar para atualizar e pelo
+  coordenador global de sincronização.
 - O catálogo de produtos do seed é gravado na primeira abertura, permitindo criar lote
   sem nenhuma chamada de rede.
 
@@ -113,10 +113,44 @@ na tarefa B6.
   `Pendente → Cancelada`); repetir o status atual não enfileira nada.
 - `sincronizarEntregas` envia os PATCHs na ordem da fila, atualiza a entrega com a resposta
   do servidor e depois puxa `/entregas/minhas`, sem sobrescrever alterações pendentes.
-- Falhas de rede mantêm a operação na fila e o erro aparece no detalhe da entrega.
-- A sincronização roda ao focar a aba de entregas e no gesto de puxar para atualizar.
+- Falhas de rede mantêm a operação na fila e o detalhe da entrega mostra o aviso.
+- A sincronização roda ao focar a aba de entregas, no gesto de puxar para atualizar e pelo
+  coordenador global de sincronização.
 - A tela de evidência já recebe a entrega real; câmera, localização e upload multipart
   entram na B7.
+
+## Sincronização, reconexão e modo avião
+
+`SincronizacaoProvider` fica acima da navegação e coordena a fila quando há usuário
+autenticado:
+
+- sincroniza ao restaurar a sessão, quando o NetInfo indica reconexão, quando o app volta
+  ao primeiro plano e a cada 30 s se houver operação pronta para envio;
+- operações com falha temporária (`5xx`, rede, `408`, `429`, `401` após refresh) ficam na
+  fila com backoff exponencial de 1 s, 2 s, 4 s, 8 s e 16 s;
+- após 5 tentativas a operação sai da fila e o conflito fica visível na entidade;
+- erros definitivos (`400`, `403`, `404`, `422`) não são repetidos: o lote mantém o erro
+  local e a entrega volta ao estado do servidor na próxima leitura, preservando o aviso;
+- `409` ao criar lote continua sendo tratado como sucesso;
+- a aba Perfil mostra conexão, operações na fila, conflitos, última sincronização e o
+  botão “Sincronizar agora”.
+
+A fila fica na tabela `fila_sincronizacao` do SQLite e cada operação guarda payload,
+contador de tentativas, último erro e próxima tentativa. Fechar o app não perde a fila.
+
+### Teste manual de modo avião
+
+1. Entre como produtor e ative o modo avião do aparelho.
+2. Crie um lote; ele deve aparecer na lista como “Pendente de envio”.
+3. Feche o app pelo seletor de tarefas e abra de novo: o lote e a pendência continuam.
+4. Desative o modo avião e volte ao app; o coordenador sincroniza ao reconectar.
+5. Confirme que o lote some de “Pendente de envio” e o detalhe mostra que está no servidor.
+6. Repita com uma entrega: altere o status offline, feche e reabra o app, reconecte e
+   confira o status confirmado pelo servidor.
+
+Para observar o backoff, deixe a API indisponível: a operação permanece na fila e as
+tentativas ficam espaçadas. Ao retornar, a próxima tentativa envia a operação. Um erro
+4xx definitivo aparece no lote ou no detalhe da entrega e não é reenviado.
 
 ## Design system
 

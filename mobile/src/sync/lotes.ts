@@ -1,8 +1,9 @@
 import { criarLote, listarMeusLotes } from '../api/lotes';
-import { ApiError } from '../api/http';
+import { ApiError, erroDefinitivo } from '../api/http';
 import { listarProdutos } from '../api/produtos';
 import type { LoteRequest } from '../api/tipos';
 import {
+  marcarErroSincronizacaoLote,
   marcarLoteSincronizado,
   salvarLoteLocal,
   upsertLotesRemotos,
@@ -16,6 +17,7 @@ import {
   registrarFalhaItem,
   removerItemFila,
 } from './fila';
+import { MAX_TENTATIVAS } from '../utils/backoff';
 
 export type ExecutarAutenticado = <T>(acao: (accessToken: string) => Promise<T>) => Promise<T>;
 
@@ -68,7 +70,7 @@ export async function sincronizarLotes(
     return resultado;
   }
 
-  const pendentes = await listarItensFila('criar_lote');
+  const pendentes = await listarItensFila('criar_lote', true);
 
   for (const item of pendentes) {
     let payload: LotePendentePayload | null = null;
@@ -87,14 +89,33 @@ export async function sincronizarLotes(
       await removerItemFila(item.id);
       resultado.enviados += 1;
     } catch (erro) {
+      const mensagem = mensagemDoErro(erro);
+
       if (erro instanceof ApiError && erro.status === 409) {
         if (payload) {
           await marcarLoteSincronizado(payload.codigoRastreio, null);
         }
         await removerItemFila(item.id);
         resultado.conflitos += 1;
+      } else if (erroDefinitivo(erro)) {
+        // 400/403/404/422 não devem ser repetidos; o conflito fica no lote local.
+        if (payload) {
+          await marcarErroSincronizacaoLote(payload.codigoRastreio, mensagem);
+        }
+        await removerItemFila(item.id);
+        resultado.falhas += 1;
+      } else if (item.tentativas + 1 >= MAX_TENTATIVAS) {
+        // Limite de tentativas: o lote permanece local com o erro visível.
+        if (payload) {
+          await marcarErroSincronizacaoLote(
+            payload.codigoRastreio,
+            `Falha após ${MAX_TENTATIVAS} tentativas: ${mensagem}`,
+          );
+        }
+        await removerItemFila(item.id);
+        resultado.falhas += 1;
       } else {
-        await registrarFalhaItem(item.id, mensagemDoErro(erro));
+        await registrarFalhaItem(item.id, mensagem);
         resultado.falhas += 1;
       }
     }

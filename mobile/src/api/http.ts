@@ -19,6 +19,17 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Erros que não devem ser repetidos automaticamente (400, 403, 404 e 422).
+ * 401 é tratado pelo refresh; 408/429 e 5xx são temporários.
+ */
+export function erroDefinitivo(erro: unknown): boolean {
+  return (
+    erro instanceof ApiError &&
+    [400, 403, 404, 422].includes(erro.status)
+  );
+}
+
 export type MetodoHttp = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export type OpcoesRequisicao = {

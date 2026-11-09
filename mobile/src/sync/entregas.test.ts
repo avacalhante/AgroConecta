@@ -9,6 +9,7 @@ const mockListarMinhasEntregas = jest.fn();
 const mockAplicarStatusLocal = jest.fn();
 const mockBuscarEntregaLocal = jest.fn();
 const mockMarcarErro = jest.fn();
+const mockReverterPendenciaComErro = jest.fn();
 const mockSalvarEntregaServidor = jest.fn();
 const mockUpsertEntregasRemotas = jest.fn();
 const mockEstaConectado = jest.fn();
@@ -26,6 +27,7 @@ jest.mock('../db/entregas', () => ({
   aplicarStatusLocal: (...args: unknown[]) => mockAplicarStatusLocal(...args),
   buscarEntregaLocal: (...args: unknown[]) => mockBuscarEntregaLocal(...args),
   marcarErroSincronizacaoEntrega: (...args: unknown[]) => mockMarcarErro(...args),
+  reverterPendenciaComErro: (...args: unknown[]) => mockReverterPendenciaComErro(...args),
   salvarEntregaServidor: (...args: unknown[]) => mockSalvarEntregaServidor(...args),
   upsertEntregasRemotas: (...args: unknown[]) => mockUpsertEntregasRemotas(...args),
 }));
@@ -94,6 +96,7 @@ describe('status de entrega local-first', () => {
     mockListarItensFila.mockResolvedValue([]);
     mockListarMinhasEntregas.mockResolvedValue([]);
     mockSalvarEntregaServidor.mockResolvedValue(undefined);
+    mockReverterPendenciaComErro.mockResolvedValue(undefined);
     mockUpsertEntregasRemotas.mockResolvedValue(undefined);
     mockEnfileirarOperacao.mockResolvedValue(undefined);
     mockRegistrarFalhaItem.mockResolvedValue(undefined);
@@ -139,7 +142,7 @@ describe('status de entrega local-first', () => {
     expect(resultado.enviados).toBe(1);
   });
 
-  it('registra falha de negócio e mantém o erro visível', async () => {
+  it('trata 422 como conflito definitivo e mantém o erro visível', async () => {
     mockListarItensFila.mockResolvedValue([ITEM_FILA]);
     mockAlterarStatusEntrega.mockRejectedValue(
       new ApiError(422, 'Transição não permitida.'),
@@ -147,10 +150,39 @@ describe('status de entrega local-first', () => {
 
     const resultado = await sincronizarEntregas(executar);
 
-    expect(mockRegistrarFalhaItem).toHaveBeenCalledWith(7, 'Transição não permitida.');
-    expect(mockMarcarErro).toHaveBeenCalledWith(1, 'Transição não permitida.');
-    expect(mockRemoverItemFila).not.toHaveBeenCalled();
+    expect(mockRegistrarFalhaItem).not.toHaveBeenCalled();
+    expect(mockReverterPendenciaComErro).toHaveBeenCalledWith(
+      1,
+      'Transição não permitida.',
+    );
+    expect(mockRemoverItemFila).toHaveBeenCalledWith(7);
     expect(resultado.falhas).toBe(1);
+  });
+
+  it('mantém 5xx na fila com backoff', async () => {
+    mockListarItensFila.mockResolvedValue([ITEM_FILA]);
+    mockAlterarStatusEntrega.mockRejectedValue(new ApiError(500, 'Erro interno.'));
+
+    const resultado = await sincronizarEntregas(executar);
+
+    expect(mockRegistrarFalhaItem).toHaveBeenCalledWith(7, 'Erro interno.');
+    expect(mockRemoverItemFila).not.toHaveBeenCalled();
+    expect(mockReverterPendenciaComErro).not.toHaveBeenCalled();
+    expect(resultado.falhas).toBe(1);
+  });
+
+  it('desiste após o limite de tentativas', async () => {
+    mockListarItensFila.mockResolvedValue([{ ...ITEM_FILA, tentativas: 4 }]);
+    mockAlterarStatusEntrega.mockRejectedValue(new ApiError(503, 'Indisponível.'));
+
+    await sincronizarEntregas(executar);
+
+    expect(mockRegistrarFalhaItem).not.toHaveBeenCalled();
+    expect(mockReverterPendenciaComErro).toHaveBeenCalledWith(
+      1,
+      'Falha após 5 tentativas: Indisponível.',
+    );
+    expect(mockRemoverItemFila).toHaveBeenCalledWith(7);
   });
 
   it('não sincroniza offline', async () => {

@@ -65,6 +65,12 @@ export function LoteDetalheScreen({ route }: MainStackScreenProps<'LoteDetalhe'>
           ? 'Este lote já está no servidor.'
           : 'O lote está salvo no aparelho e será enviado quando houver conexão.'}
       </Text>
+
+      {lote.erroSincronizacao ? (
+        <Text style={styles.erro} accessibilityRole="alert">
+          Falha ao sincronizar: {lote.erroSincronizacao}
+        </Text>
+      ) : null}
     </Screen>
   );
 }
@@ -83,5 +89,10 @@ const styles = StyleSheet.create({
   aviso: {
     ...typography.legenda,
     marginTop: theme.spacing.md,
+  },
+  erro: {
+    ...typography.corpo,
+    color: theme.colors.danger,
+    marginTop: theme.spacing.sm,
   },
 });

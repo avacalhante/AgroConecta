@@ -1,14 +1,15 @@
 import { alterarStatusEntrega, listarMinhasEntregas } from '../api/entregas';
-import { ApiError } from '../api/http';
+import { ApiError, erroDefinitivo } from '../api/http';
 import type { Entrega, EntregaStatusRequest } from '../api/tipos';
 import {
   aplicarStatusLocal,
   buscarEntregaLocal,
-  marcarErroSincronizacaoEntrega,
+  reverterPendenciaComErro,
   salvarEntregaServidor,
   upsertEntregasRemotas,
 } from '../db/entregas';
 import type { EntregaStatus } from '../types/dominio';
+import { MAX_TENTATIVAS } from '../utils/backoff';
 import { transicaoPermitida } from '../utils/entregas';
 import { estaConectado } from './conexao';
 import {
@@ -73,7 +74,7 @@ export async function sincronizarEntregas(
     return resultado;
   }
 
-  const pendentes = await listarItensFila('atualizar_status_entrega');
+  const pendentes = await listarItensFila('atualizar_status_entrega', true);
 
   for (const item of pendentes) {
     try {
@@ -92,13 +93,32 @@ export async function sincronizarEntregas(
       resultado.enviados += 1;
     } catch (erro) {
       const mensagem = mensagemDoErro(erro);
-      await registrarFalhaItem(item.id, mensagem);
-      try {
-        const payload = JSON.parse(item.payload) as StatusPendentePayload;
-        await marcarErroSincronizacaoEntrega(payload.id, mensagem);
-      } catch {
-        // Payload corrompido: a fila já registrou a falha.
+
+      if (erroDefinitivo(erro)) {
+        // 400/403/404/422 não devem ser repetidos; volta ao estado do servidor
+        // na próxima leitura e mantém o conflito visível.
+        try {
+          const payload = JSON.parse(item.payload) as StatusPendentePayload;
+          await reverterPendenciaComErro(payload.id, mensagem);
+        } catch {
+          // Payload corrompido: remove a operação inválida abaixo.
+        }
+        await removerItemFila(item.id);
+      } else if (item.tentativas + 1 >= MAX_TENTATIVAS) {
+        try {
+          const payload = JSON.parse(item.payload) as StatusPendentePayload;
+          await reverterPendenciaComErro(
+            payload.id,
+            `Falha após ${MAX_TENTATIVAS} tentativas: ${mensagem}`,
+          );
+        } catch {
+          // Payload corrompido: apenas descarta a operação.
+        }
+        await removerItemFila(item.id);
+      } else {
+        await registrarFalhaItem(item.id, mensagem);
       }
+
       resultado.falhas += 1;
     }
   }

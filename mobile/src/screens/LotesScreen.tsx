@@ -124,6 +124,9 @@ function ItemLote({ item, navigation }: ItemLoteProps) {
       {item.sincronizado ? null : (
         <Text style={styles.pendente}>Pendente de envio</Text>
       )}
+      {item.erroSincronizacao ? (
+        <Text style={styles.erro}>Falha ao sincronizar: {item.erroSincronizacao}</Text>
+      ) : null}
     </Card>
   );
 }
@@ -161,5 +164,9 @@ const styles = StyleSheet.create({
     ...typography.legenda,
     color: theme.colors.warning,
     fontWeight: theme.fontWeight.bold,
+  },
+  erro: {
+    ...typography.legenda,
+    color: theme.colors.danger,
   },
 });

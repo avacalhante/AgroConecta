@@ -6,6 +6,7 @@ const mockCriarLote = jest.fn();
 const mockListarMeusLotes = jest.fn();
 const mockListarProdutos = jest.fn();
 const mockMarcarLoteSincronizado = jest.fn();
+const mockMarcarErroSincronizacaoLote = jest.fn();
 const mockUpsertLotesRemotos = jest.fn();
 const mockSalvarProdutosRemotos = jest.fn();
 const mockEstaConectado = jest.fn();
@@ -25,6 +26,8 @@ jest.mock('../api/produtos', () => ({
 jest.mock('../db/lotes', () => ({
   salvarLoteLocal: jest.fn(),
   marcarLoteSincronizado: (...args: unknown[]) => mockMarcarLoteSincronizado(...args),
+  marcarErroSincronizacaoLote: (...args: unknown[]) =>
+    mockMarcarErroSincronizacaoLote(...args),
   upsertLotesRemotos: (...args: unknown[]) => mockUpsertLotesRemotos(...args),
 }));
 
@@ -86,6 +89,7 @@ describe('sincronizarLotes', () => {
     mockListarMeusLotes.mockResolvedValue(PAGINA_VAZIA);
     mockListarProdutos.mockResolvedValue(PRODUTOS_VAZIOS);
     mockMarcarLoteSincronizado.mockResolvedValue(undefined);
+    mockMarcarErroSincronizacaoLote.mockResolvedValue(undefined);
     mockUpsertLotesRemotos.mockResolvedValue(undefined);
     mockSalvarProdutosRemotos.mockResolvedValue(undefined);
     mockRegistrarFalhaItem.mockResolvedValue(undefined);
@@ -140,6 +144,20 @@ describe('sincronizarLotes', () => {
 
     expect(mockRegistrarFalhaItem).toHaveBeenCalledWith(10, 'Sem conexão.');
     expect(mockRemoverItemFila).not.toHaveBeenCalled();
+    expect(resultado.falhas).toBe(1);
+  });
+
+  it('trata 422 como definitivo e expõe o erro no lote', async () => {
+    mockListarItensFila.mockResolvedValue([ITEM]);
+    mockCriarLote.mockRejectedValue(new ApiError(422, 'Quantidade inválida.'));
+
+    const resultado = await sincronizarLotes(executar);
+
+    expect(mockMarcarErroSincronizacaoLote).toHaveBeenCalledWith(
+      CODIGO,
+      'Quantidade inválida.',
+    );
+    expect(mockRemoverItemFila).toHaveBeenCalledWith(10);
     expect(resultado.falhas).toBe(1);
   });
 

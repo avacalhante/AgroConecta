@@ -14,6 +14,7 @@ export type LoteLocal = {
   status: LoteStatus;
   criadoEm: string;
   sincronizado: boolean;
+  erroSincronizacao: string | null;
 };
 
 export type NovoLoteLocal = {
@@ -39,6 +40,7 @@ type LinhaLote = {
   status: string;
   criado_em: string;
   sincronizado: number;
+  erro_sincronizacao: string | null;
 };
 
 function paraLote(linha: LinhaLote): LoteLocal {
@@ -54,6 +56,7 @@ function paraLote(linha: LinhaLote): LoteLocal {
     status: linha.status as LoteStatus,
     criadoEm: linha.criado_em,
     sincronizado: linha.sincronizado === 1,
+    erroSincronizacao: linha.erro_sincronizacao,
   };
 }
 
@@ -110,9 +113,20 @@ export async function marcarLoteSincronizado(
   const banco = await obterBanco();
   await banco.runAsync(
     `UPDATE lotes
-       SET sincronizado = 1, id_remoto = COALESCE(?, id_remoto)
+       SET sincronizado = 1, id_remoto = COALESCE(?, id_remoto), erro_sincronizacao = NULL
      WHERE codigo_rastreio = ?`,
     [idRemoto, codigoRastreio],
+  );
+}
+
+export async function marcarErroSincronizacaoLote(
+  codigoRastreio: string,
+  mensagem: string,
+): Promise<void> {
+  const banco = await obterBanco();
+  await banco.runAsync(
+    'UPDATE lotes SET erro_sincronizacao = ? WHERE codigo_rastreio = ?',
+    [mensagem, codigoRastreio],
   );
 }
 

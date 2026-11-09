@@ -4,6 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider } from './src/auth/AuthContext';
 import { RootNavigator } from './src/navigation/RootNavigator';
+import { SincronizacaoProvider } from './src/sync/SincronizacaoProvider';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,8 +21,10 @@ export default function App() {
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <StatusBar style="dark" />
-          <RootNavigator />
+          <SincronizacaoProvider>
+            <StatusBar style="dark" />
+            <RootNavigator />
+          </SincronizacaoProvider>
         </AuthProvider>
       </QueryClientProvider>
     </SafeAreaProvider>

@@ -2,9 +2,11 @@ import { StyleSheet, Text } from 'react-native';
 
 import { useAuth } from '../auth/AuthContext';
 import { Button, Card, InfoRow, Screen } from '../components';
+import { useSincronizacao } from '../sync/SincronizacaoProvider';
 import { theme } from '../theme/tokens';
 import { typography } from '../theme/typography';
 import type { Papel } from '../types/dominio';
+import { formatarDataHora } from '../utils/format';
 
 const ROTULOS_PAPEL: Record<Papel, string> = {
   Admin: 'Administrador',
@@ -13,9 +15,18 @@ const ROTULOS_PAPEL: Record<Papel, string> = {
   Motorista: 'Motorista',
 };
 
-/** Perfil do usuário autenticado; a fila offline entra na tarefa B6. */
+/** Perfil do usuário autenticado e painel de sincronização offline. */
 export function PerfilScreen() {
   const { sair, saindo, usuario } = useAuth();
+  const {
+    conflitos,
+    online,
+    pendentes,
+    sincronizando,
+    ultimaSincronizacao,
+    ultimoResultado,
+    sincronizarAgora,
+  } = useSincronizacao();
 
   if (!usuario) {
     return null;
@@ -32,9 +43,39 @@ export function PerfilScreen() {
       </Card>
 
       <Card title="Sincronização">
-        <Text style={styles.detalhe}>
-          Fila offline ainda não implementada (tarefa B6). Nenhum item pendente.
-        </Text>
+        <InfoRow
+          label="Conexão"
+          value={online === null ? 'Verificando…' : online ? 'Online' : 'Offline'}
+        />
+        <InfoRow label="Operações na fila" value={String(pendentes)} />
+        <InfoRow label="Conflitos" value={String(conflitos)} />
+        <InfoRow
+          label="Última sincronização"
+          value={
+            ultimaSincronizacao
+              ? formatarDataHora(ultimaSincronizacao.toISOString())
+              : '—'
+          }
+        />
+
+        {ultimoResultado && ultimoResultado.falhas > 0 ? (
+          <Text style={styles.aviso} accessibilityLiveRegion="polite">
+            A última sincronização teve {ultimoResultado.falhas} falha(s). Verifique os
+            lotes e entregas com aviso.
+          </Text>
+        ) : null}
+
+        <Button
+          title="Sincronizar agora"
+          variant="secondary"
+          onPress={() => {
+            void sincronizarAgora();
+          }}
+          loading={sincronizando}
+          disabled={sincronizando}
+          style={styles.botaoSincronizar}
+          testID="botao-sincronizar"
+        />
       </Card>
 
       <Button
@@ -56,8 +97,13 @@ const styles = StyleSheet.create({
   titulo: {
     marginBottom: theme.spacing.lg,
   },
-  detalhe: {
-    ...typography.corpoMuted,
+  aviso: {
+    ...typography.legenda,
+    color: theme.colors.warning,
+    marginTop: theme.spacing.sm,
+  },
+  botaoSincronizar: {
+    marginTop: theme.spacing.md,
   },
   botaoSair: {
     marginTop: theme.spacing.md,

@@ -65,8 +65,12 @@ export async function buscarEntregaLocal(id: number): Promise<EntregaLocal | nul
 }
 
 /** Grava a versão do servidor e limpa a marcação de pendência. */
-export async function salvarEntregaServidor(entrega: Entrega): Promise<void> {
+export async function salvarEntregaServidor(
+  entrega: Entrega,
+  preservarErro = false,
+): Promise<void> {
   const banco = await obterBanco();
+  const expressaoErro = preservarErro ? 'entregas.erro_sincronizacao' : 'NULL';
   await banco.runAsync(
     `INSERT INTO entregas (
        id, pedido_id, status, data_prevista, data_realizada,
@@ -85,7 +89,7 @@ export async function salvarEntregaServidor(entrega: Entrega): Promise<void> {
        observacao = excluded.observacao,
        atualizado_em = excluded.atualizado_em,
        pendente = 0,
-       erro_sincronizacao = NULL`,
+       erro_sincronizacao = ${expressaoErro}`,
     [
       entrega.id,
       entrega.pedidoId,
@@ -115,7 +119,7 @@ export async function upsertEntregasRemotas(entregas: Entrega[]): Promise<void> 
       continue;
     }
 
-    await salvarEntregaServidor(entrega);
+    await salvarEntregaServidor(entrega, true);
   }
 }
 
@@ -153,6 +157,18 @@ export async function marcarErroSincronizacaoEntrega(
   const banco = await obterBanco();
   await banco.runAsync(
     'UPDATE entregas SET erro_sincronizacao = ? WHERE id = ?',
+    [mensagem, id],
+  );
+}
+
+/** Reverte a pendência após erro definitivo, mantendo o conflito visível. */
+export async function reverterPendenciaComErro(
+  id: number,
+  mensagem: string,
+): Promise<void> {
+  const banco = await obterBanco();
+  await banco.runAsync(
+    'UPDATE entregas SET pendente = 0, erro_sincronizacao = ? WHERE id = ?',
     [mensagem, id],
   );
 }
