@@ -13,8 +13,6 @@ public class ConsultasWebRepositorio(AgroConectaDbContext contexto) : IConsultas
     {
         var consulta = contexto.Produtores
             .AsNoTracking()
-            .Include(produtor => produtor.Usuario)
-            .Include(produtor => produtor.Cooperativa)
             .AsQueryable();
 
         if (status is not null)
@@ -104,11 +102,6 @@ public class ConsultasWebRepositorio(AgroConectaDbContext contexto) : IConsultas
         CancellationToken cancellationToken = default) =>
         await contexto.Entregas
             .AsNoTracking()
-            .Include(entrega => entrega.Pedido)
-            .ThenInclude(pedido => pedido.Comprador)
-            .Include(entrega => entrega.Rota)
-            .ThenInclude(rota => rota!.Motorista)
-            .ThenInclude(motorista => motorista.Usuario)
             .OrderBy(entrega => entrega.DataPrevista)
             .Select(entrega => new EntregaResumo(
                 entrega.Id,
