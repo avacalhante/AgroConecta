@@ -22,6 +22,10 @@ public class PedidoConfiguration : IEntityTypeConfiguration<Pedido>
             .HasDatabaseName("IX_Pedido_Status_DataPedido");
         builder.HasIndex(pedido => pedido.CompradorId).HasDatabaseName("IX_Pedido_CompradorId");
 
+        builder.Navigation(pedido => pedido.Itens)
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasField("_itens");
+
         builder.ToTable(tabela => tabela.HasCheckConstraint("CK_Pedido_ValorTotal", "[ValorTotal] >= 0"));
     }
 }

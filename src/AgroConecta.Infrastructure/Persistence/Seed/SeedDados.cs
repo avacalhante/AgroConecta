@@ -126,7 +126,6 @@ public static class SeedDados
             CodigoRastreio = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
             DataColheita = new DateOnly(2026, 11, 1),
             Quantidade = 120m,
-            Status = StatusLote.Disponivel,
         };
 
         var loteAlface = new LoteColheita
@@ -136,48 +135,33 @@ public static class SeedDados
             CodigoRastreio = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
             DataColheita = new DateOnly(2026, 11, 2),
             Quantidade = 80m,
-            Status = StatusLote.Reservado,
         };
 
         var pedido1 = new Pedido
         {
             Comprador = comprador,
             DataPedido = DataPedido1,
-            Status = StatusPedido.EmRota,
-            ValorTotal = 425.00m,
             EnderecoEntrega = "Rua das Acácias, 120 — Campinas/SP",
-            Itens =
-            {
-                new ItemPedido
-                {
-                    Produto = tomate,
-                    Lote = loteTomate,
-                    Quantidade = 50m,
-                    PrecoUnitario = 8.50m,
-                    Subtotal = 425.00m,
-                },
-            },
         };
+
+        pedido1.AdicionarItem(tomate, loteTomate, 50m, 8.50m);
+        pedido1.AlterarStatus(StatusPedido.AguardandoAprovacao);
+        pedido1.AlterarStatus(StatusPedido.Aprovado);
+        pedido1.AlterarStatus(StatusPedido.EmSeparacao);
+        pedido1.AlterarStatus(StatusPedido.EmRota);
 
         var pedido2 = new Pedido
         {
             Comprador = comprador,
             DataPedido = DataPedido2,
-            Status = StatusPedido.Aprovado,
-            ValorTotal = 320.00m,
             EnderecoEntrega = "Av. dos Ipês, 45 — Valinhos/SP",
-            Itens =
-            {
-                new ItemPedido
-                {
-                    Produto = alface,
-                    Lote = loteAlface,
-                    Quantidade = 100m,
-                    PrecoUnitario = 3.20m,
-                    Subtotal = 320.00m,
-                },
-            },
         };
+
+        pedido2.AdicionarItem(alface, loteAlface, 100m, 3.20m);
+        pedido2.AlterarStatus(StatusPedido.AguardandoAprovacao);
+        pedido2.AlterarStatus(StatusPedido.Aprovado);
+
+        loteAlface.Reservar();
 
         var rota = new Rota
         {
@@ -191,15 +175,14 @@ public static class SeedDados
         {
             Pedido = pedido1,
             Rota = rota,
-            Status = StatusEntrega.EmRota,
             DataPrevista = new DateOnly(2026, 11, 5),
         };
+        entrega1.AlterarStatus(StatusEntrega.EmRota);
 
         var entrega2 = new Entrega
         {
             Pedido = pedido2,
             Rota = rota,
-            Status = StatusEntrega.Pendente,
             DataPrevista = new DateOnly(2026, 11, 6),
         };
 
