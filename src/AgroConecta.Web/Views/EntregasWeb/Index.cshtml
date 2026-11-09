@@ -1,0 +1,113 @@
+@model AgroConecta.Web.Models.EntregasViewModel
+@{
+    ViewData["Title"] = "Entregas e rotas";
+    var ehAdmin = User.IsInRole(nameof(AgroConecta.Domain.Enums.PapelUsuario.Admin));
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 mb-3">
+    <div>
+        <h1 class="h3 mb-1">Entregas e rotas</h1>
+        <p class="text-muted mb-0">Acompanhamento logístico das entregas programadas.</p>
+    </div>
+    @if (ehAdmin)
+    {
+        <a asp-action="Criar" class="btn btn-success">Nova rota</a>
+    }
+</div>
+
+@if (TempData["Mensagem"] is string mensagem)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @mensagem
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+}
+
+<h2 class="h5 mt-4 mb-2">Rotas programadas</h2>
+<div class="card border-0 shadow-sm mb-4">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <caption class="visually-hidden">Rotas programadas</caption>
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Motorista</th>
+                    <th scope="col">Veículo</th>
+                    <th scope="col" class="text-center">Entregas</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rota in Model.Rotas)
+                {
+                    <tr>
+                        <td>@rota.Id</td>
+                        <td>@rota.Data.ToString("dd/MM/yyyy")</td>
+                        <td>@rota.Motorista</td>
+                        <td>@rota.Veiculo</td>
+                        <td class="text-center">@rota.Entregas.Count</td>
+                        <td><span class="badge bg-secondary">@rota.Status</span></td>
+                    </tr>
+                }
+                @if (Model.Rotas.Count == 0)
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma rota programada.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<h2 class="h5 mb-2">Entregas</h2>
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <caption class="visually-hidden">Lista de entregas</caption>
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Pedido</th>
+                    <th scope="col">Comprador</th>
+                    <th scope="col">Motorista</th>
+                    <th scope="col">Prevista</th>
+                    <th scope="col">Realizada</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Evidência</th>
+                    <th scope="col" class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entrega in Model.Entregas)
+                {
+                    <tr>
+                        <td>@entrega.Id</td>
+                        <td><a asp-controller="PedidosWeb" asp-action="Detalhe" asp-route-id="@entrega.PedidoId">@entrega.PedidoId</a></td>
+                        <td>@entrega.Comprador</td>
+                        <td>@(entrega.Motorista ?? "—")</td>
+                        <td>@entrega.DataPrevista.ToString("dd/MM/yyyy")</td>
+                        <td>@(entrega.DataRealizada?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "—")</td>
+                        <td><span class="badge @Badges.Entrega(entrega.Status)">@entrega.Status</span></td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(entrega.FotoUrl))
+                            {
+                                <a href="@entrega.FotoUrl" target="_blank" rel="noopener" class="small">Ver foto</a>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">Sem foto</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a asp-controller="PedidosWeb" asp-action="Detalhe" asp-route-id="@entrega.PedidoId" class="btn btn-sm btn-outline-success">Pedido</a>
+                        </td>
+                    </tr>
+                }
+                @if (Model.Entregas.Count == 0)
+                {
+                    <tr><td colspan="9" class="text-center text-muted py-4">Nenhuma entrega registrada.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

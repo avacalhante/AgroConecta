@@ -1,0 +1,68 @@
+@model IReadOnlyList<AgroConecta.Application.Relatorios.VendaProdutorResumo>
+@{
+    ViewData["Title"] = "Vendas por produtor";
+    var inicio = (DateOnly)ViewData["Inicio"]!;
+    var fim = (DateOnly)ViewData["Fim"]!;
+    var totalGeral = Model.Sum(venda => venda.ValorTotal);
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 mb-3">
+    <div>
+        <h1 class="h3 mb-1">Vendas por produtor</h1>
+        <p class="text-muted mb-0">Consolidado de vendas no período selecionado.</p>
+    </div>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-sm-4 col-md-3">
+        <label for="inicio" class="form-label">Início</label>
+        <input id="inicio" name="inicio" type="date" value="@inicio.ToString("yyyy-MM-dd")" class="form-control" />
+    </div>
+    <div class="col-sm-4 col-md-3">
+        <label for="fim" class="form-label">Fim</label>
+        <input id="fim" name="fim" type="date" value="@fim.ToString("yyyy-MM-dd")" class="form-control" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-success">Filtrar</button>
+        <a asp-action="VendasPorProdutor" class="btn btn-outline-secondary">Mês atual</a>
+    </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span class="small text-muted">@inicio.ToString("dd/MM/yyyy") a @fim.ToString("dd/MM/yyyy")</span>
+        <strong>Total: @totalGeral.ToString("C")</strong>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <caption class="visually-hidden">Vendas por produtor</caption>
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Produtor</th>
+                    <th scope="col">Comunidade</th>
+                    <th scope="col">Cooperativa</th>
+                    <th scope="col" class="text-center">Pedidos</th>
+                    <th scope="col" class="text-end">Quantidade</th>
+                    <th scope="col" class="text-end">Valor total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var venda in Model)
+                {
+                    <tr>
+                        <td><strong>@venda.Produtor</strong></td>
+                        <td>@venda.Comunidade</td>
+                        <td>@(venda.Cooperativa ?? "—")</td>
+                        <td class="text-center">@venda.Pedidos</td>
+                        <td class="text-end">@venda.Quantidade</td>
+                        <td class="text-end">@venda.ValorTotal.ToString("C")</td>
+                    </tr>
+                }
+                @if (Model.Count == 0)
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma venda no período.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

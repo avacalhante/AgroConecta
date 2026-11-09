@@ -1,0 +1,50 @@
+@model AgroConecta.Web.Models.CooperativaViewModel
+@{
+    ViewData["Title"] = "Nova cooperativa";
+}
+
+<div class="row justify-content-center mt-3">
+    <div class="col-lg-7">
+        <h1 class="h3 mb-3">Nova cooperativa</h1>
+
+        <form asp-action="Criar" method="post" class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Nome" class="form-label"></label>
+                    <input asp-for="Nome" class="form-control" />
+                    <span asp-validation-for="Nome" class="text-danger small"></span>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-sm-8">
+                        <label asp-for="Cidade" class="form-label"></label>
+                        <input asp-for="Cidade" class="form-control" />
+                        <span asp-validation-for="Cidade" class="text-danger small"></span>
+                    </div>
+                    <div class="col-sm-4">
+                        <label asp-for="UF" class="form-label"></label>
+                        <input asp-for="UF" class="form-control" maxlength="2" />
+                        <span asp-validation-for="UF" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <label asp-for="Tipo" class="form-label"></label>
+                    <input asp-for="Tipo" class="form-control" />
+                    <span asp-validation-for="Tipo" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="card-footer bg-white d-flex justify-content-end gap-2">
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-success">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

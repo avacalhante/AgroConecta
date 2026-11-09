@@ -1,0 +1,50 @@
+@model AgroConecta.Web.Models.ProdutoViewModel
+@{
+    ViewData["Title"] = "Novo produto";
+}
+
+<div class="row justify-content-center mt-3">
+    <div class="col-lg-7">
+        <h1 class="h3 mb-3">Novo produto</h1>
+
+        <form asp-action="Criar" method="post" class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Nome" class="form-label"></label>
+                    <input asp-for="Nome" class="form-control" />
+                    <span asp-validation-for="Nome" class="text-danger small"></span>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label asp-for="Categoria" class="form-label"></label>
+                        <input asp-for="Categoria" class="form-control" />
+                        <span asp-validation-for="Categoria" class="text-danger small"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="Unidade" class="form-label"></label>
+                        <input asp-for="Unidade" class="form-control" />
+                        <span asp-validation-for="Unidade" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <label asp-for="PrecoBase" class="form-label"></label>
+                    <input asp-for="PrecoBase" class="form-control" type="number" step="0.01" min="0" />
+                    <span asp-validation-for="PrecoBase" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="card-footer bg-white d-flex justify-content-end gap-2">
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-success">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,82 @@
+@model AgroConecta.Domain.Common.ResultadoPaginado<AgroConecta.Application.Produtos.ProdutoDto>
+@{
+    ViewData["Title"] = "Produtos";
+    var ativoFiltro = ViewData["Ativo"] as bool?;
+    var podeGerenciar = User.IsInRole(nameof(AgroConecta.Domain.Enums.PapelUsuario.Admin))
+        || User.IsInRole(nameof(AgroConecta.Domain.Enums.PapelUsuario.Produtor));
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 mb-3">
+    <div>
+        <h1 class="h3 mb-1">Catálogo de produtos</h1>
+        <p class="text-muted mb-0">Itens ofertados pelos produtores da agricultura familiar.</p>
+    </div>
+    @if (podeGerenciar)
+    {
+        <a asp-action="Criar" class="btn btn-success">Novo produto</a>
+    }
+</div>
+
+@if (TempData["Mensagem"] is string mensagem)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @mensagem
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+}
+
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-sm-4 col-md-3">
+        <label for="ativo" class="form-label">Situação</label>
+        <select id="ativo" name="ativo" class="form-select">
+            <option value="">Todos</option>
+            <option value="true" selected="@(ativoFiltro == true ? "selected" : null)">Ativos</option>
+            <option value="false" selected="@(ativoFiltro == false ? "selected" : null)">Inativos</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-success">Filtrar</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
+    </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <caption class="visually-hidden">Lista de produtos</caption>
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Produto</th>
+                    <th scope="col">Categoria</th>
+                    <th scope="col">Unidade</th>
+                    <th scope="col" class="text-end">Preço-base</th>
+                    <th scope="col">Situação</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var produto in Model.Itens)
+                {
+                    <tr>
+                        <td><strong>@produto.Nome</strong></td>
+                        <td>@produto.Categoria</td>
+                        <td>@produto.Unidade</td>
+                        <td class="text-end">@produto.PrecoBase.ToString("C")</td>
+                        <td>
+                            <span class="badge @(produto.Ativo ? "bg-success" : "bg-secondary")">
+                                @(produto.Ativo ? "Ativo" : "Inativo")
+                            </span>
+                        </td>
+                    </tr>
+                }
+                @if (Model.Itens.Count == 0)
+                {
+                    <tr><td colspan="5" class="text-center text-muted py-4">Nenhum produto encontrado.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center small text-muted">
+        <span>@Model.Total produto(s)</span>
+        <span>Página @Model.Pagina</span>
+    </div>
+</div>

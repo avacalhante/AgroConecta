@@ -1,0 +1,97 @@
+@model IReadOnlyList<AgroConecta.Application.Consultas.ProdutorResumo>
+@{
+    ViewData["Title"] = "Produtores";
+    var statusSelecionado = ViewData["Status"] as AgroConecta.Domain.Enums.StatusCadastro?;
+    var ehAdmin = User.IsInRole(nameof(AgroConecta.Domain.Enums.PapelUsuario.Admin));
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 mb-3">
+    <div>
+        <h1 class="h3 mb-1">Produtores</h1>
+        <p class="text-muted mb-0">Cadastros da agricultura familiar e situação de aprovação.</p>
+    </div>
+</div>
+
+@if (TempData["Mensagem"] is string mensagem)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @mensagem
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+}
+
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-sm-4 col-md-3">
+        <label for="status" class="form-label">Status do cadastro</label>
+        <select id="status" name="status" class="form-select">
+            <option value="">Todos</option>
+            @foreach (var status in Enum.GetValues<AgroConecta.Domain.Enums.StatusCadastro>())
+            {
+                <option value="@status" selected="@(statusSelecionado == status ? "selected" : null)">@status</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-success">Filtrar</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
+    </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <caption class="visually-hidden">Lista de produtores</caption>
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Produtor</th>
+                    <th scope="col">Propriedade</th>
+                    <th scope="col">Comunidade</th>
+                    <th scope="col">Cooperativa</th>
+                    <th scope="col">Documento</th>
+                    <th scope="col">Status</th>
+                    @if (ehAdmin)
+                    {
+                        <th scope="col" class="text-end">Ações</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var produtor in Model)
+                {
+                    <tr>
+                        <td>
+                            <strong>@produtor.Nome</strong>
+                            <small class="d-block text-muted">@produtor.Email · @produtor.Cidade/@produtor.UF</small>
+                        </td>
+                        <td>@produtor.NomePropriedade</td>
+                        <td>@produtor.Comunidade</td>
+                        <td>@(produtor.Cooperativa ?? "—")</td>
+                        <td>@produtor.Documento</td>
+                        <td><span class="badge @Badges.Cadastro(produtor.StatusCadastro)">@produtor.StatusCadastro</span></td>
+                        @if (ehAdmin)
+                        {
+                            <td class="text-end">
+                                <form asp-action="Aprovar" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@produtor.Id" />
+                                    <button type="submit" name="aprovar" value="true" class="btn btn-sm btn-outline-success"
+                                            disabled="@(produtor.StatusCadastro == AgroConecta.Domain.Enums.StatusCadastro.Aprovado ? "disabled" : null)">
+                                        Aprovar
+                                    </button>
+                                    <button type="submit" name="aprovar" value="false" class="btn btn-sm btn-outline-danger"
+                                            disabled="@(produtor.StatusCadastro == AgroConecta.Domain.Enums.StatusCadastro.Rejeitado ? "disabled" : null)">
+                                        Rejeitar
+                                    </button>
+                                </form>
+                            </td>
+                        }
+                    </tr>
+                }
+                @if (Model.Count == 0)
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-4">Nenhum produtor encontrado.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

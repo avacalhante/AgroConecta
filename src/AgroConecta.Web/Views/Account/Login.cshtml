@@ -1,0 +1,59 @@
+@model AgroConecta.Web.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Entrar";
+}
+
+<div class="row justify-content-center align-items-center min-vh-75 py-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h3 mb-1">AgroConecta</h1>
+                <p class="text-muted mb-4">Plataforma corporativa da agricultura familiar.</p>
+
+                <form asp-action="Login" method="post" novalidate>
+                    <input type="hidden" asp-for="ReturnUrl" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" autocomplete="username" autofocus />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Senha" class="form-label"></label>
+                        <input asp-for="Senha" class="form-control" autocomplete="current-password" />
+                        <span asp-validation-for="Senha" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input asp-for="Lembrar" class="form-check-input" />
+                        <label asp-for="Lembrar" class="form-check-label"></label>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Entrar</button>
+
+                    <p class="form-text mt-3 mb-0">
+                        Ao entrar, você concorda com o tratamento dos seus dados conforme a
+                        <a asp-controller="Home" asp-action="Privacidade">Política de Privacidade</a>.
+                    </p>
+                </form>
+
+                <hr class="my-4" />
+
+                <p class="small text-muted mb-1">Usuários de demonstração (seed):</p>
+                <ul class="small text-muted mb-0">
+                    <li>admin@agroconecta.local · Admin@123</li>
+                    <li>produtor@agroconecta.local · Produtor@123</li>
+                    <li>comprador@agroconecta.local · Comprador@123</li>
+                    <li>motorista@agroconecta.local · Motorista@123</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,142 @@
+@model AgroConecta.Application.Pedidos.PedidoDto
+@{
+    ViewData["Title"] = $"Pedido {Model.Id}";
+    var podeOperar = User.IsInRole(nameof(AgroConecta.Domain.Enums.PapelUsuario.Admin))
+        || User.IsInRole(nameof(AgroConecta.Domain.Enums.PapelUsuario.Produtor))
+        || User.IsInRole(nameof(AgroConecta.Domain.Enums.PapelUsuario.Motorista));
+    var proximos = AgroConecta.Web.Models.PedidoTransicoes.Proximos(Model.Status);
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 mb-3">
+    <div>
+        <h1 class="h3 mb-1">Pedido #@Model.Id</h1>
+        <p class="text-muted mb-0">@Model.CompradorNome · @Model.DataPedido.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
+</div>
+
+@if (TempData["Mensagem"] is string mensagem)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @mensagem
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+}
+@if (TempData["Erro"] is string erro)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @erro
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h2 class="h5 mb-0">Itens</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <caption class="visually-hidden">Itens do pedido</caption>
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Produto</th>
+                            <th scope="col" class="text-end">Qtd.</th>
+                            <th scope="col" class="text-end">Preço unit.</th>
+                            <th scope="col" class="text-end">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Itens)
+                        {
+                            <tr>
+                                <td>@item.ProdutoNome</td>
+                                <td class="text-end">@item.Quantidade</td>
+                                <td class="text-end">@item.PrecoUnitario.ToString("C")</td>
+                                <td class="text-end">@item.Subtotal.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr class="table-light">
+                            <th colspan="3" class="text-end">Total</th>
+                            <th class="text-end">@Model.ValorTotal.ToString("C")</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h2 class="h6 text-uppercase text-muted mb-3">Resumo</h2>
+                <dl class="row mb-0 small">
+                    <dt class="col-5">Status</dt>
+                    <dd class="col-7"><span class="badge @Badges.Pedido(Model.Status)">@Model.Status</span></dd>
+
+                    <dt class="col-5">Comprador</dt>
+                    <dd class="col-7">@Model.CompradorNome</dd>
+
+                    <dt class="col-5">Endereço</dt>
+                    <dd class="col-7">@Model.EnderecoEntrega</dd>
+                </dl>
+            </div>
+        </div>
+
+        @if (podeOperar && proximos.Count > 0)
+        {
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="h6 text-uppercase text-muted mb-3">Alterar status</h2>
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var proximo in proximos)
+                        {
+                            <form asp-action="AlterarStatus" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <input type="hidden" name="status" value="@proximo" />
+                                <button type="submit" class="btn btn-sm btn-outline-success">@proximo</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @{
+            var fatura = ViewData["Fatura"] as AgroConecta.Domain.Entities.Fatura;
+            var ehAdmin = User.IsInRole(nameof(AgroConecta.Domain.Enums.PapelUsuario.Admin));
+        }
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-body">
+                <h2 class="h6 text-uppercase text-muted mb-3">Fatura</h2>
+                @if (fatura is not null)
+                {
+                    <dl class="row mb-0 small">
+                        <dt class="col-5">Número</dt>
+                        <dd class="col-7">@fatura.Numero</dd>
+                        <dt class="col-5">Valor</dt>
+                        <dd class="col-7">@fatura.Valor.ToString("C")</dd>
+                        <dt class="col-5">Status</dt>
+                        <dd class="col-7"><span class="badge @Badges.Fatura(fatura.Status)">@fatura.Status</span></dd>
+                    </dl>
+                }
+                else if (ehAdmin)
+                {
+                    <form asp-action="GerarFatura" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-sm btn-outline-success">Gerar fatura</button>
+                    </form>
+                }
+                else
+                {
+                    <p class="text-muted small mb-0">Nenhuma fatura emitida.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
