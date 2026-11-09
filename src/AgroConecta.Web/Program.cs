@@ -41,6 +41,20 @@ builder.Services.AddRateLimiter(options =>
             }));
 });
 builder.Services.AddEndpointsApiExplorer();
+
+// CORS restrito às origens conhecidas do aplicativo móvel/web (configurável).
+var origensPermitidas = builder.Configuration
+    .GetSection("Cors:Origens")
+    .Get<string[]>() ?? [];
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AppMovel", politica =>
+        politica
+            .WithOrigins(origensPermitidas)
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new()
@@ -250,6 +264,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+app.UseCors("AppMovel");
 
 app.UseRateLimiter();
 
