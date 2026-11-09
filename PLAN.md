@@ -25,7 +25,7 @@
 
 Levar o projeto do repositório vazio até a entrega final do PIM IV, com:
 
-1. Protótipo funcional Web (.NET 8 + ASP.NET Core MVC/API + SQL Server 2022).
+1. Protótipo funcional Web (.NET 10 + ASP.NET Core MVC/API + SQL Server 2022).
 2. Aplicativo Mobile (React Native + Expo + TypeScript) com operação offline básica.
 3. Banco de dados modelado, script SQL completo, procedures e triggers.
 4. Contrato de API versionado e compartilhado entre as duas frentes.
@@ -217,7 +217,7 @@ documenta etapa 1 do PIM
            │        HTTP/JSON              │
            ▼                               ▼
 ┌──────────────────────────────────────────────────────┐
-│  AgroConecta.Web (ASP.NET Core 8)                    │
+│  AgroConecta.Web (ASP.NET Core 10)                   │
 │  MVC + Web API v1 + Swagger                         │
 └──────────────────────┬───────────────────────────────┘
                        │
@@ -244,9 +244,9 @@ documenta etapa 1 do PIM
 
 | Camada | Tecnologia | Versão/observação |
 |---|---|---|
-| Runtime | .NET | 8 (LTS) |
+| Runtime | .NET | 10 (LTS, SDK disponível na máquina) |
 | Web/API | ASP.NET Core MVC + Web API | Um projeto `AgroConecta.Web` |
-| ORM | EF Core | 8 |
+| ORM | EF Core | 10 |
 | Banco | SQL Server | 2022, via Docker |
 | Autenticação Web | ASP.NET Core Identity | Cookie |
 | Autenticação API | JWT | Access + refresh |
@@ -851,7 +851,7 @@ npx expo start
 **Backend (`backend.yml`):**
 
 1. Checkout.
-2. Setup .NET 8.
+2. Setup .NET 10.
 3. Restore.
 4. Build.
 5. Testes com cobertura.
