@@ -56,6 +56,7 @@ var jwtConfiguracao = builder.Configuration
         "A seção 'Jwt' não foi configurada. Veja appsettings.json.");
 
 builder.Services.AddInfrastructure(connectionString, jwtConfiguracao);
+builder.Services.AddScoped<AgroConecta.Web.Servicos.ArmazenamentoEvidencia>();
 
 builder.Services
     .AddAuthentication(options =>
@@ -200,6 +201,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();

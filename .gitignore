@@ -27,6 +27,9 @@ mobile/ios/
 # Bibliotecas de terceiros versionadas pelo template da Web
 !src/AgroConecta.Web/wwwroot/lib/**/dist/
 
+# Uploads de evidências gerados em tempo de execução
+src/AgroConecta.Web/wwwroot/uploads/
+
 # Ambiente e segredos
 .env
 .env.*

@@ -1,5 +1,7 @@
 using AgroConecta.Application.Auth;
 using AgroConecta.Application.Common;
+using AgroConecta.Application.Entregas;
+using AgroConecta.Application.Indicadores;
 using AgroConecta.Application.Lotes;
 using AgroConecta.Application.Pedidos;
 using AgroConecta.Application.Produtos;
@@ -32,6 +34,12 @@ public static class DependencyInjection
         services.AddScoped<ICasoDeUso<ListarMeusLotesConsulta, Domain.Common.ResultadoPaginado<LoteDto>>, ListarMeusLotesCasoDeUso>();
         services.AddScoped<ICasoDeUso<int, LoteDto>, ObterLoteCasoDeUso>();
         services.AddScoped<ICasoDeUso<CriarLoteComando, LoteDto>, CriarLoteCasoDeUso>();
+
+        services.AddScoped<ICasoDeUso<ListarMinhasEntregasConsulta, IReadOnlyCollection<EntregaDto>>, ListarMinhasEntregasCasoDeUso>();
+        services.AddScoped<ICasoDeUso<AlterarStatusEntregaComando, EntregaDto>, AlterarStatusEntregaCasoDeUso>();
+        services.AddScoped<ICasoDeUso<RegistrarEvidenciaComando, EntregaDto>, RegistrarEvidenciaCasoDeUso>();
+
+        services.AddScoped<ICasoDeUso<bool, IndicadoresDto>, ObterIndicadoresCasoDeUso>();
 
         return services;
     }
