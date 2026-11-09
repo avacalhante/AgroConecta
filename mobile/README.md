@@ -43,9 +43,8 @@ src/
 ├── api/         cliente HTTP, endpoints e configuração (B3)
 ├── auth/        sessão segura e AuthContext (B2)
 ├── components/  design system: botão, campo, cartão, badge, estados
-├── db/          SQLite local: produtos, lotes e fila (B4/B6)
+├── db/          SQLite local: produtos, lotes, entregas e fila (B4/B6)
 ├── hooks/       consultas e sincronização usadas pelas telas
-├── mock/        fixtures das telas de demonstração
 ├── navigation/  pilha raiz, pilha autenticada e abas principais
 ├── screens/     telas do produtor e do motorista
 ├── sync/        conectividade, fila e sincronização (B4/B6)
@@ -58,10 +57,11 @@ src/
 
 - `RootNavigator`: pilha raiz com `Login` e `Main` (autenticado).
 - `MainStack`: abas principais mais as telas de detalhe:
-  - `LoteDetalhe` (parâmetro `loteId`);
+  - `NovoLote` e `LoteDetalhe` (parâmetro `codigoRastreio`);
   - `EntregaDetalhe`, `EntregaStatus` e `EntregaEvidencia` (parâmetro `entregaId`).
-- `MainTabs`: Início, Lotes, Entregas e Perfil. As telas de aba usam `MainTabScreenProps`,
-  que combina a navegação das abas com a pilha principal.
+- `MainTabs`: Início, Perfil e as abas do papel autenticado — Lotes para produtor/admin,
+  Entregas para motorista/admin. As telas de aba usam `MainTabScreenProps`, que combina a
+  navegação das abas com a pilha principal.
 
 ## Autenticação
 
@@ -104,6 +104,19 @@ na tarefa B6.
   Retry com backoff, listener de reconexão e conflitos visíveis entram na B6.
 - O catálogo de produtos do seed é gravado na primeira abertura, permitindo criar lote
   sem nenhuma chamada de rede.
+
+## Fluxo do motorista
+
+- A lista lê as entregas do SQLite; cada alteração de status é aplicada localmente antes
+  de entrar na fila (`atualizar_status_entrega`).
+- As transições seguem `contracts/enums.md` (`Pendente → EmRota → Entregue/Falha`,
+  `Pendente → Cancelada`); repetir o status atual não enfileira nada.
+- `sincronizarEntregas` envia os PATCHs na ordem da fila, atualiza a entrega com a resposta
+  do servidor e depois puxa `/entregas/minhas`, sem sobrescrever alterações pendentes.
+- Falhas de rede mantêm a operação na fila e o erro aparece no detalhe da entrega.
+- A sincronização roda ao focar a aba de entregas e no gesto de puxar para atualizar.
+- A tela de evidência já recebe a entrega real; câmera, localização e upload multipart
+  entram na B7.
 
 ## Design system
 

@@ -2,7 +2,7 @@ import * as SQLite from 'expo-sqlite';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
 const NOME_BANCO = 'agroconecta.db';
-const VERSAO_ESQUEMA = 1;
+const VERSAO_ESQUEMA = 2;
 
 let promessaBanco: Promise<SQLiteDatabase> | null = null;
 
@@ -16,7 +16,9 @@ async function abrirBanco(): Promise<SQLiteDatabase> {
   const banco = await SQLite.openDatabaseAsync(NOME_BANCO);
   const linha = await banco.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
 
-  if ((linha?.user_version ?? 0) < VERSAO_ESQUEMA) {
+  const versao = linha?.user_version ?? 0;
+
+  if (versao < 1) {
     await banco.execAsync(`
 PRAGMA journal_mode = WAL;
 
@@ -60,6 +62,29 @@ PRAGMA user_version = 1;
 `);
 
     await semearProdutos(banco);
+  }
+
+  if (versao < VERSAO_ESQUEMA) {
+    await banco.execAsync(`
+CREATE TABLE IF NOT EXISTS entregas (
+  id INTEGER PRIMARY KEY NOT NULL,
+  pedido_id INTEGER NOT NULL,
+  status TEXT NOT NULL,
+  data_prevista TEXT NOT NULL,
+  data_realizada TEXT,
+  latitude REAL,
+  longitude REAL,
+  foto_url TEXT,
+  observacao TEXT,
+  atualizado_em TEXT NOT NULL,
+  pendente INTEGER NOT NULL DEFAULT 0,
+  erro_sincronizacao TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_entregas_pendentes ON entregas (pendente);
+
+PRAGMA user_version = 2;
+`);
   }
 
   return banco;

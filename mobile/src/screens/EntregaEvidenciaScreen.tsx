@@ -1,28 +1,43 @@
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Button, Card, ErrorState, Field, InfoRow, Screen } from '../components';
-import { buscarEntrega } from '../mock/dados';
+import { Button, Card, ErrorState, Field, InfoRow, LoadingState, Screen } from '../components';
+import { buscarEntregaLocal } from '../db/entregas';
 import type { MainStackScreenProps } from '../navigation/types';
 import { theme } from '../theme/tokens';
 import { typography } from '../theme/typography';
 
-/** Evidência mockada; câmera, localização e upload entram na tarefa B7. */
+/** Estrutura da evidência; câmera, localização e upload entram na tarefa B7. */
 export function EntregaEvidenciaScreen({
   route,
-  navigation,
 }: MainStackScreenProps<'EntregaEvidencia'>) {
+  const { entregaId } = route.params;
   const [observacao, setObservacao] = useState('');
-  const entrega = buscarEntrega(route.params.entregaId);
+  const consulta = useQuery({
+    queryKey: ['entrega-local', entregaId],
+    queryFn: () => buscarEntregaLocal(entregaId),
+  });
+
+  if (consulta.isLoading) {
+    return (
+      <Screen>
+        <LoadingState message="Carregando entrega…" />
+      </Screen>
+    );
+  }
+
+  const entrega = consulta.data;
 
   if (!entrega) {
     return (
-      <Screen scrollable>
+      <Screen>
         <ErrorState
           title="Entrega não encontrada"
           message="A entrega pode ter sido removida na última sincronização."
-          onRetry={() => navigation.goBack()}
-          retryLabel="Voltar"
+          onRetry={() => {
+            void consulta.refetch();
+          }}
         />
       </Screen>
     );
@@ -31,9 +46,7 @@ export function EntregaEvidenciaScreen({
   return (
     <Screen scrollable>
       <Text style={[typography.titulo, styles.titulo]}>Evidência da entrega</Text>
-      <Text style={styles.descricao}>
-        Pedido {entrega.pedidoId} • {entrega.destino}
-      </Text>
+      <Text style={styles.descricao}>Pedido {entrega.pedidoId}</Text>
 
       <Card title="Foto">
         <View style={styles.foto}>
@@ -72,8 +85,8 @@ export function EntregaEvidenciaScreen({
       />
 
       <Text style={styles.aviso}>
-        Demonstração da B1: a evidência ainda não é enviada. Upload multipart e fallback de
-        permissão entram na tarefa B7.
+        A captura, o GPS e o upload multipart entram na tarefa B7. O rascunho não é enviado
+        nesta etapa.
       </Text>
     </Screen>
   );

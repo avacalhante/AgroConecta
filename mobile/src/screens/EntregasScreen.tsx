@@ -1,26 +1,79 @@
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
-import { Card, Screen, StatusBadge } from '../components';
-import { ENTREGAS_EXEMPLO, type EntregaExemplo } from '../mock/dados';
+import { Card, EmptyState, ErrorState, LoadingState, Screen, StatusBadge } from '../components';
+import type { EntregaLocal } from '../db/entregas';
+import { useEntregas } from '../hooks/useEntregas';
 import type { MainTabScreenProps } from '../navigation/types';
 import { statusMeta } from '../theme/status';
 import { theme } from '../theme/tokens';
 import { typography } from '../theme/typography';
 import { formatarData } from '../utils/format';
 
-/** Lista provisória de entregas do motorista; fluxo real nas tarefas B5 e B7. */
+/** Minhas entregas: estado local, atualização pendente e sincronização sob demanda. */
 export function EntregasScreen({ navigation }: MainTabScreenProps<'Entregas'>) {
+  const { data, error, isLoading, offline, refetch, sincronizar, sincronizando } =
+    useEntregas();
+
+  useFocusEffect(
+    useCallback(() => {
+      void sincronizar();
+    }, [sincronizar]),
+  );
+
+  if (isLoading) {
+    return (
+      <Screen>
+        <LoadingState message="Carregando entregas…" />
+      </Screen>
+    );
+  }
+
+  if (error) {
+    return (
+      <Screen>
+        <ErrorState
+          title="Não foi possível ler as entregas"
+          message="O banco local não respondeu. Tente novamente."
+          onRetry={() => {
+            void refetch();
+          }}
+        />
+      </Screen>
+    );
+  }
+
+  const entregas = data ?? [];
+
   return (
     <Screen padded={false}>
       <View style={styles.cabecalho}>
         <Text style={typography.titulo}>Minhas entregas</Text>
-        <Text style={styles.descricao}>Dados de exemplo até a integração da API.</Text>
+        <Text style={styles.descricao}>
+          Atualize o status mesmo sem internet; a lista reflete o estado local.
+        </Text>
+        {offline ? (
+          <Text style={styles.avisoOffline} accessibilityLiveRegion="polite">
+            Sem conexão. As alterações pendentes serão enviadas ao reconectar.
+          </Text>
+        ) : null}
       </View>
 
       <FlatList
-        data={ENTREGAS_EXEMPLO}
+        data={entregas}
         keyExtractor={(item) => String(item.id)}
         contentContainerStyle={styles.lista}
+        refreshing={sincronizando}
+        onRefresh={() => {
+          void sincronizar();
+        }}
+        ListEmptyComponent={
+          <EmptyState
+            title="Nenhuma entrega atribuída"
+            description="As entregas aparecem aqui após a sincronização com a API."
+          />
+        }
         renderItem={({ item }) => <ItemEntrega item={item} navigation={navigation} />}
       />
     </Screen>
@@ -28,25 +81,27 @@ export function EntregasScreen({ navigation }: MainTabScreenProps<'Entregas'>) {
 }
 
 type ItemEntregaProps = {
-  item: EntregaExemplo;
+  item: EntregaLocal;
   navigation: MainTabScreenProps<'Entregas'>['navigation'];
 };
 
 function ItemEntrega({ item, navigation }: ItemEntregaProps) {
+  const situacao = item.pendente ? ', pendente de envio' : '';
+
   return (
     <Card
       onPress={() => navigation.navigate('EntregaDetalhe', { entregaId: item.id })}
-      accessibilityLabel={`Pedido ${item.pedidoId}, destino ${item.destino}, prevista para ${formatarData(
+      accessibilityLabel={`Pedido ${item.pedidoId}, prevista para ${formatarData(
         item.dataPrevista,
-      )}, status ${statusMeta[item.status].label}`}
+      )}, status ${statusMeta[item.status].label}${situacao}`}
       testID={`entrega-${item.id}`}
     >
       <View style={styles.linhaTitulo}>
         <Text style={[typography.secao, styles.pedido]}>Pedido {item.pedidoId}</Text>
         <StatusBadge status={item.status} />
       </View>
-      <Text style={styles.detalhe}>Destino: {item.destino}</Text>
       <Text style={styles.detalhe}>Prevista: {formatarData(item.dataPrevista)}</Text>
+      {item.pendente ? <Text style={styles.pendente}>Pendente de envio</Text> : null}
     </Card>
   );
 }
@@ -59,6 +114,10 @@ const styles = StyleSheet.create({
   },
   descricao: {
     ...typography.corpoMuted,
+  },
+  avisoOffline: {
+    ...typography.legenda,
+    color: theme.colors.warning,
   },
   lista: {
     padding: theme.spacing.md,
@@ -75,5 +134,10 @@ const styles = StyleSheet.create({
   },
   detalhe: {
     ...typography.corpoMuted,
+  },
+  pendente: {
+    ...typography.legenda,
+    color: theme.colors.warning,
+    fontWeight: theme.fontWeight.bold,
   },
 });

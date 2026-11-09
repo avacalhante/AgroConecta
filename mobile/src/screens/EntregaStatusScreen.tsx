@@ -1,42 +1,83 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Button, Card, EmptyState, ErrorState, Screen, StatusBadge } from '../components';
-import { buscarEntrega } from '../mock/dados';
+import {
+  Button,
+  Card,
+  EmptyState,
+  ErrorState,
+  LoadingState,
+  Screen,
+  StatusBadge,
+} from '../components';
+import { buscarEntregaLocal } from '../db/entregas';
 import type { MainStackScreenProps } from '../navigation/types';
+import { agendarStatusEntrega } from '../sync/entregas';
 import { statusMeta } from '../theme/status';
 import { theme } from '../theme/tokens';
 import { typography } from '../theme/typography';
 import type { EntregaStatus } from '../types/dominio';
+import { proximosStatusEntrega } from '../utils/entregas';
 
-/** Transições permitidas em `contracts/enums.md` para `EntregaStatus`. */
-const proximosStatusEntrega: Record<EntregaStatus, EntregaStatus[]> = {
-  Pendente: ['EmRota', 'Cancelada'],
-  EmRota: ['Entregue', 'Falha'],
-  Entregue: [],
-  Falha: [],
-  Cancelada: [],
-};
-
-/** Alteração de status mockada; gravação e sincronização entram na tarefa B5. */
+/** Alteração de status local-first, enviada depois como PATCH idempotente. */
 export function EntregaStatusScreen({ route, navigation }: MainStackScreenProps<'EntregaStatus'>) {
+  const { entregaId } = route.params;
+  const queryClient = useQueryClient();
+  const consulta = useQuery({
+    queryKey: ['entrega-local', entregaId],
+    queryFn: () => buscarEntregaLocal(entregaId),
+  });
+
   const [selecionado, setSelecionado] = useState<EntregaStatus | null>(null);
-  const entrega = buscarEntrega(route.params.entregaId);
+  const [salvando, setSalvando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+
+  async function confirmar() {
+    if (!selecionado) {
+      return;
+    }
+
+    setSalvando(true);
+    setErro(null);
+
+    try {
+      await agendarStatusEntrega(entregaId, selecionado);
+      await queryClient.invalidateQueries({ queryKey: ['entregas-locais'] });
+      await queryClient.invalidateQueries({ queryKey: ['entrega-local', entregaId] });
+      navigation.goBack();
+    } catch {
+      setErro('Não foi possível salvar o status no dispositivo. Tente novamente.');
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  if (consulta.isLoading) {
+    return (
+      <Screen>
+        <LoadingState message="Carregando entrega…" />
+      </Screen>
+    );
+  }
+
+  const entrega = consulta.data;
 
   if (!entrega) {
     return (
-      <Screen scrollable>
+      <Screen>
         <ErrorState
           title="Entrega não encontrada"
           message="A entrega pode ter sido removida na última sincronização."
-          onRetry={() => navigation.goBack()}
-          retryLabel="Voltar"
+          onRetry={() => {
+            void consulta.refetch();
+          }}
         />
       </Screen>
     );
   }
 
-  const opcoes = proximosStatusEntrega[entrega.status];
+  const opcoes = proximosStatusEntrega(entrega.status);
 
   return (
     <Screen scrollable>
@@ -85,10 +126,23 @@ export function EntregaStatusScreen({ route, navigation }: MainStackScreenProps<
             })}
           </Card>
 
+          {erro ? (
+            <Text
+              style={styles.erro}
+              accessibilityRole="alert"
+              accessibilityLiveRegion="polite"
+            >
+              {erro}
+            </Text>
+          ) : null}
+
           <Button
             title="Confirmar status"
             disabled={selecionado === null}
-            onPress={() => navigation.goBack()}
+            loading={salvando}
+            onPress={() => {
+              void confirmar();
+            }}
             style={styles.acao}
             testID="botao-confirmar-status"
           />
@@ -96,8 +150,8 @@ export function EntregaStatusScreen({ route, navigation }: MainStackScreenProps<
       )}
 
       <Text style={styles.aviso}>
-        Demonstração da B1: o status ainda não é gravado. Gravação local e sincronização entram
-        na tarefa B5.
+        O status é salvo no aparelho e enviado quando houver conexão. Repetir a mesma
+        operação não gera efeito colateral no servidor.
       </Text>
     </Screen>
   );
@@ -145,6 +199,11 @@ const styles = StyleSheet.create({
   marcadorAtivo: {
     borderColor: theme.colors.primary,
     backgroundColor: theme.colors.primary,
+  },
+  erro: {
+    ...typography.corpo,
+    color: theme.colors.danger,
+    marginTop: theme.spacing.md,
   },
   acao: {
     marginTop: theme.spacing.md,

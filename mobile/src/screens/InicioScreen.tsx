@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { useAuth } from '../auth/AuthContext';
 import { Button, Card, Screen } from '../components';
 import type { MainTabScreenProps } from '../navigation/types';
 import { theme } from '../theme/tokens';
@@ -21,6 +22,10 @@ function Indicador({ rotulo, valor }: IndicadorProps) {
 
 /** Tela inicial provisória; os indicadores reais chegam com a integração da API. */
 export function InicioScreen({ navigation }: MainTabScreenProps<'Inicio'>) {
+  const { usuario } = useAuth();
+  const mostrarLotes = usuario?.papel === 'Produtor' || usuario?.papel === 'Admin';
+  const mostrarEntregas = usuario?.papel === 'Motorista' || usuario?.papel === 'Admin';
+
   return (
     <Screen scrollable>
       <Text style={typography.titulo}>Início</Text>
@@ -36,19 +41,27 @@ export function InicioScreen({ navigation }: MainTabScreenProps<'Inicio'>) {
         <Indicador rotulo="Entregas com evidência" valor="85%" />
       </View>
 
-      <Text style={[typography.secao, styles.secaoTitulo]}>Ações rápidas</Text>
-      <View style={styles.acoes}>
-        <Button
-          title="Ver meus lotes"
-          variant="secondary"
-          onPress={() => navigation.navigate('Lotes')}
-        />
-        <Button
-          title="Ver minhas entregas"
-          variant="secondary"
-          onPress={() => navigation.navigate('Entregas')}
-        />
-      </View>
+      {mostrarLotes || mostrarEntregas ? (
+        <>
+          <Text style={[typography.secao, styles.secaoTitulo]}>Ações rápidas</Text>
+          <View style={styles.acoes}>
+            {mostrarLotes ? (
+              <Button
+                title="Ver meus lotes"
+                variant="secondary"
+                onPress={() => navigation.navigate('Lotes')}
+              />
+            ) : null}
+            {mostrarEntregas ? (
+              <Button
+                title="Ver minhas entregas"
+                variant="secondary"
+                onPress={() => navigation.navigate('Entregas')}
+              />
+            ) : null}
+          </View>
+        </>
+      ) : null}
     </Screen>
   );
 }
