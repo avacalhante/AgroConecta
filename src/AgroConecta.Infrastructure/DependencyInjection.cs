@@ -1,4 +1,6 @@
+using AgroConecta.Domain.Abstractions;
 using AgroConecta.Infrastructure.Persistence;
+using AgroConecta.Infrastructure.Repositorios;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +20,12 @@ public static class DependencyInjection
                 sqlServer.MigrationsAssembly(typeof(AgroConectaDbContext).Assembly.FullName);
                 sqlServer.EnableRetryOnFailure(3);
             }));
+
+        services.AddScoped<IProdutoRepositorio, ProdutoRepositorio>();
+        services.AddScoped<IPedidoRepositorio, PedidoRepositorio>();
+        services.AddScoped<ILoteRepositorio, LoteRepositorio>();
+        services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
+        services.AddScoped<IUnidadeDeTrabalho, UnidadeDeTrabalho>();
 
         return services;
     }
