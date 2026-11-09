@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel · AgroConecta</title>
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/site.css?v=zeR5PHeeHbxfGkL8WV86OzdoF6UnjuCmnagaocD-cbo" />
+    <link rel="stylesheet" href="/AgroConecta.Web.styles.css?v=j4_zDPdGwjQ_GXWHlNaTAYN65rlavxlmrNYQZEaG2RI" />
+</head>
+<body>
+    <a b-m5kf3e5nlv class="visually-hidden-focusable p-2 bg-white" href="#conteudo">Pular para o conteúdo</a>
+
+    <header b-m5kf3e5nlv>
+        <nav b-m5kf3e5nlv class="navbar navbar-expand-lg navbar-dark bg-success" aria-label="Navegação principal">
+            <div b-m5kf3e5nlv class="container-fluid">
+                <a class="navbar-brand fw-semibold" href="/">AgroConecta</a>
+                <button b-m5kf3e5nlv class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal"
+                        aria-controls="menuPrincipal" aria-expanded="false" aria-label="Abrir menu">
+                    <span b-m5kf3e5nlv class="navbar-toggler-icon"></span>
+                </button>
+
+                <div b-m5kf3e5nlv class="collapse navbar-collapse" id="menuPrincipal">
+                        <ul b-m5kf3e5nlv class="navbar-nav me-auto">
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/">Painel</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/Produtores">Produtores</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/Cooperativas">Cooperativas</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/ProdutosWeb">Produtos</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/PedidosWeb">Pedidos</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/EntregasWeb">Entregas</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/Faturas">Faturas</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/api/v1/relatorios/vendas-produtor">Relatórios</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/Inclusao">Inclusão</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/Usuarios">Usuários</a></li>
+                        </ul>
+                        <div b-m5kf3e5nlv class="d-flex align-items-center gap-3 text-white">
+                            <span b-m5kf3e5nlv class="small">
+                                Ana Administradora
+                                <span b-m5kf3e5nlv class="badge bg-light text-success ms-1">Admin</span>
+                            </span>
+                            <form method="post" class="m-0" action="/Account/Logout">
+                                
+                                <button b-m5kf3e5nlv type="submit" class="btn btn-sm btn-outline-light">Sair</button>
+                            <input name="__RequestVerificationToken" type="hidden" value="***" /></form>
+                        </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main b-m5kf3e5nlv id="conteudo" role="main" class="container pb-5">
+        
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 mb-4">
+    <div>
+        <h1 class="h3 mb-1">Painel administrativo</h1>
+        <p class="text-muted mb-0">Visão consolidada da operação da agricultura familiar.</p>
+    </div>
+    <a class="btn btn-outline-success" href="/Inclusao">Painel de inclusão</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Pedidos no mês</p>
+                <p class="display-6 mb-0">3</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Entregas no prazo</p>
+                <p class="display-6 mb-0">100%</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Entregas com evidência</p>
+                <p class="display-6 mb-0">33,3%</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Produtores ativos</p>
+                <p class="display-6 mb-0">2</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Cooperativas ativas</p>
+                <p class="h2 mb-0">1</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm ">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Produtores aguardando aprovação</p>
+                <p class="h2 mb-0">0</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Faturas em aberto</p>
+                <p class="h2 mb-0">2</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Pedidos recentes</h2>
+                <a class="btn btn-sm btn-outline-success" href="/PedidosWeb">Ver todos</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <caption class="visually-hidden">Pedidos recentes</caption>
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Comprador</th>
+                            <th scope="col">Status</th>
+                            <th scope="col" class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            <tr>
+                                <td><a href="/PedidosWeb/Detalhe/3">3</a></td>
+                                <td>Carla Compradora</td>
+                                <td><span class="badge bg-warning text-dark">AguardandoAprovacao</span></td>
+                                <td class="text-end">R$ 60,00</td>
+                            </tr>
+                            <tr>
+                                <td><a href="/PedidosWeb/Detalhe/2">2</a></td>
+                                <td>Carla Compradora</td>
+                                <td><span class="badge bg-info text-dark">Aprovado</span></td>
+                                <td class="text-end">R$ 320,00</td>
+                            </tr>
+                            <tr>
+                                <td><a href="/PedidosWeb/Detalhe/1">1</a></td>
+                                <td>Carla Compradora</td>
+                                <td><span class="badge bg-primary">EmRota</span></td>
+                                <td class="text-end">R$ 425,00</td>
+                            </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Entregas próximas</h2>
+                <a class="btn btn-sm btn-outline-success" href="/EntregasWeb">Ver todas</a>
+            </div>
+            <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center gap-2">
+                        <span>
+                            Pedido 1 · Carla Compradora
+                            <small class="d-block text-muted">Prevista para 05/11/2026</small>
+                        </span>
+                        <span class="badge bg-primary">EmRota</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center gap-2">
+                        <span>
+                            Pedido 2 · Carla Compradora
+                            <small class="d-block text-muted">Prevista para 06/11/2026</small>
+                        </span>
+                        <span class="badge bg-secondary">Pendente</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center gap-2">
+                        <span>
+                            Pedido 3 · Carla Compradora
+                            <small class="d-block text-muted">Prevista para 25/11/2026</small>
+                        </span>
+                        <span class="badge bg-success">Entregue</span>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+    </main>
+
+    <footer b-m5kf3e5nlv class="border-top footer text-muted bg-white">
+        <div b-m5kf3e5nlv class="container py-3 small d-flex justify-content-between flex-wrap gap-2">
+            <span b-m5kf3e5nlv>&copy; 2026 AgroConecta · PIM IV</span>
+            <span b-m5kf3e5nlv>
+                Protótipo acadêmico — dados fictícios de demonstração.
+                <a class="ms-2" href="/Home/Privacidade">Privacidade e LGPD</a>
+            </span>
+        </div>
+    </footer>
+
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/site.js?v=y_Ngd8W21UpuCUhEqGbUKDEqFnNfTjAfb24GhJJGUyM"></script>
+    
+</body>
+</html>

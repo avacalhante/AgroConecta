@@ -1,0 +1,17 @@
+Item|Total
+----|-----
+TABELAS|15
+PROCEDURES|3
+TRIGGERS|3
+USUARIOS|5
+PEDIDOS|2
+ENTREGAS|2
+FATURAS|1
+Objeto
+------
+sp_CalcularTotalPedido
+sp_ConsolidarEstoqueLote
+sp_RelatorioVendasProdutor
+trg_Entrega_LogStatus
+trg_ItemPedido_MovimentoEstoque
+trg_Produtor_AuditaAprovacao

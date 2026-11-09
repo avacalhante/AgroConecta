@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Entrar · AgroConecta</title>
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/site.css?v=zeR5PHeeHbxfGkL8WV86OzdoF6UnjuCmnagaocD-cbo" />
+    <link rel="stylesheet" href="/AgroConecta.Web.styles.css?v=j4_zDPdGwjQ_GXWHlNaTAYN65rlavxlmrNYQZEaG2RI" />
+</head>
+<body>
+    <a b-m5kf3e5nlv class="visually-hidden-focusable p-2 bg-white" href="#conteudo">Pular para o conteúdo</a>
+
+    <header b-m5kf3e5nlv>
+        <nav b-m5kf3e5nlv class="navbar navbar-expand-lg navbar-dark bg-success" aria-label="Navegação principal">
+            <div b-m5kf3e5nlv class="container-fluid">
+                <a class="navbar-brand fw-semibold" href="/">AgroConecta</a>
+                <button b-m5kf3e5nlv class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal"
+                        aria-controls="menuPrincipal" aria-expanded="false" aria-label="Abrir menu">
+                    <span b-m5kf3e5nlv class="navbar-toggler-icon"></span>
+                </button>
+
+                <div b-m5kf3e5nlv class="collapse navbar-collapse" id="menuPrincipal">
+                        <ul b-m5kf3e5nlv class="navbar-nav ms-auto">
+                            <li b-m5kf3e5nlv class="nav-item">
+                                <a class="nav-link" href="/Account/Login">Entrar</a>
+                            </li>
+                        </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main b-m5kf3e5nlv id="conteudo" role="main" class="container pb-5">
+        
+<div class="row justify-content-center align-items-center min-vh-75 py-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h3 mb-1">AgroConecta</h1>
+                <p class="text-muted mb-4">Plataforma corporativa da agricultura familiar.</p>
+
+                <form method="post" novalidate action="/Account/Login">
+                    <input type="hidden" id="ReturnUrl" name="ReturnUrl" value="" />
+
+                    
+
+                    <div class="mb-3">
+                        <label class="form-label" for="Email">E-mail</label>
+                        <input class="form-control" autocomplete="username" autofocus type="email" data-val="true" data-val-email="Informe um e-mail v&#xE1;lido." data-val-required="Informe o e-mail." id="Email" name="Email" value="" />
+                        <span class="text-danger small field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="Senha">Senha</label>
+                        <input class="form-control" autocomplete="current-password" type="password" data-val="true" data-val-required="Informe a senha." id="Senha" name="Senha" />
+                        <span class="text-danger small field-validation-valid" data-valmsg-for="Senha" data-valmsg-replace="true"></span>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" data-val="true" data-val-required="The Continuar conectado field is required." id="Lembrar" name="Lembrar" value="true" />
+                        <label class="form-check-label" for="Lembrar">Continuar conectado</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Entrar</button>
+
+                    <p class="form-text mt-3 mb-0">
+                        Ao entrar, você concorda com o tratamento dos seus dados conforme a
+                        <a href="/Home/Privacidade">Política de Privacidade</a>.
+                    </p>
+                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8LiU3uZK-sRDsuLbXf5kd473HW0U2V8zZ9nJpqhw3vQDfV-XERjHKVBv4qwxPQSbkQmtRvHD8geVSdfkUhIm_0tMHUB5mpDSdUGex3EstKy1kpHFQT6uAkWS896frQtiq8pxEwK-aYpha4CGb6PTkfY" /><input name="Lembrar" type="hidden" value="false" /></form>
+
+                <hr class="my-4" />
+
+                <p class="small text-muted mb-1">Usuários de demonstração (seed):</p>
+                <ul class="small text-muted mb-0">
+                    <li>admin@agroconecta.local · Admin@123</li>
+                    <li>produtor@agroconecta.local · Produtor@123</li>
+                    <li>comprador@agroconecta.local · Comprador@123</li>
+                    <li>motorista@agroconecta.local · Motorista@123</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    </main>
+
+    <footer b-m5kf3e5nlv class="border-top footer text-muted bg-white">
+        <div b-m5kf3e5nlv class="container py-3 small d-flex justify-content-between flex-wrap gap-2">
+            <span b-m5kf3e5nlv>&copy; 2026 AgroConecta · PIM IV</span>
+            <span b-m5kf3e5nlv>
+                Protótipo acadêmico — dados fictícios de demonstração.
+                <a class="ms-2" href="/Home/Privacidade">Privacidade e LGPD</a>
+            </span>
+        </div>
+    </footer>
+
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/site.js?v=y_Ngd8W21UpuCUhEqGbUKDEqFnNfTjAfb24GhJJGUyM"></script>
+    
+    <script src="/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+
+
+</body>
+</html>

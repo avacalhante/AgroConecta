@@ -1,0 +1,9 @@
+{
+  "id": 2,
+  "pedidoId": 3,
+  "numero": "FAT-2026-00003",
+  "valor": 60.00,
+  "status": "Emitida",
+  "emitidaEm": "2026-11-09T23:44:00.2421591Z",
+  "pagoEm": null
+}

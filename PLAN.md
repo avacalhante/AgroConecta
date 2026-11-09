@@ -526,19 +526,20 @@ A0 → A1 → A2 → A3 → A4 → A5 → A6 → A7 → A8 → A9 → A10 → A1
 
 ### 7.4 Critérios de aceite da Parte A
 
-> **Status em 2026-11-09:** itens verificáveis neste ambiente estão concluídos
-> (build/testes, contrato, login, telas, fluxo completo, acessibilidade
-> documentada e evidências). A validação em SQL Server real permanece pendente
-> porque o socket do Docker não está acessível; os scripts estão versionados.
+> **Status em 2026-11-09:** critérios de aceite verificados neste ambiente.
+> SQL Server 2022 foi validado em container (script completo, migrations,
+> procedures e triggers). O plugin `docker compose` não está instalado e o build
+> da imagem da aplicação ficou pendente por limite de espaço em disco; a
+> aplicação foi executada diretamente contra o banco real.
 
 - [x] `dotnet build` e `dotnet test` verdes.
-- [ ] Banco criado do zero com um comando.
-- [ ] Script SQL completo executável em banco limpo.
+- [x] Banco criado do zero com um comando.
+- [x] Script SQL completo executável em banco limpo.
 - [x] Swagger disponível e contrato válido.
 - [x] Login Web (cookie) e API (JWT) funcionando.
 - [x] 10 telas Web funcionais com dados reais do seed.
 - [x] Fluxo completo: produtor → produto → lote → pedido → rota → entrega → fatura.
-- [ ] Procedures e triggers executando.
+- [x] Procedures e triggers executando.
 - [x] Acessibilidade mínima validada.
 - [x] Nenhum segredo commitado (apenas chaves de desenvolvimento documentadas).
 - [x] Evidências em `evidencias/web/`, `evidencias/api/`, `evidencias/banco/`.

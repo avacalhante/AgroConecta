@@ -50,6 +50,6 @@ critérios de aceite) está em `../PLAN.md` e em `../PIM_4-web/PLAN.md`.
 
 | Risco | Mitigação |
 |---|---|
-| Ambiente sem Docker para validar SQL Server | Scripts versionados; execução pendente em ambiente com Docker |
-| Capturas de tela ainda não geradas | Gerar após subir o ambiente local |
+| Plugin `docker compose` ausente no ambiente | Validação feita com `docker run`/`docker exec`; compose versionado para ambientes com o plugin |
+| Limite de disco impede build da imagem Docker | Dockerfile versionado; build deve rodar em CI ou máquina com espaço |
 | Segredos de desenvolvimento nos arquivos de configuração | Trocar por Key Vault/ambiente em produção (documentado) |

@@ -1,0 +1,11 @@
+{
+  "id": 3,
+  "produtorId": 1,
+  "produtoId": 4,
+  "produtoNome": "Produto Evidência 1794267839",
+  "codigoRastreio": "3507f83c-deac-4a34-8acc-06e2a8c3d480",
+  "dataColheita": "2026-11-08",
+  "quantidade": 40,
+  "status": "Disponivel",
+  "criadoEm": "2026-11-09T23:43:59.8301943Z"
+}

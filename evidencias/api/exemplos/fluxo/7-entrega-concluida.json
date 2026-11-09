@@ -1,0 +1,11 @@
+{
+  "id": 3,
+  "pedidoId": 3,
+  "status": "Entregue",
+  "dataPrevista": "2026-11-25",
+  "dataRealizada": "2026-11-09T23:44:00.1997251Z",
+  "latitude": -22.9068,
+  "longitude": -43.1729,
+  "fotoUrl": "/uploads/entregas/66d928f17d694dfe8e0bc97a355c4973.png",
+  "observacao": "Entrega confirmada"
+}

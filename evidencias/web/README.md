@@ -41,8 +41,12 @@ Aplicação ASP.NET Core MVC com autenticação por cookie e autorização por p
 
 Checklist detalhado em `../PIM_4-web/docs/seguranca-lgpd.md`.
 
-## Capturas pendentes
+## Capturas
 
-As imagens das telas devem ser geradas com a aplicação em execução conectada ao
-SQL Server (ver `devops/`). Enquanto o Docker não estiver disponível, esta pasta
-documenta as rotas e os comportamentos verificados por testes de fumo.
+As imagens das telas foram geradas em 2026-11-09 com a aplicação conectada ao
+SQL Server 2022 em container, usando Chromium headless em 1280×900:
+
+- `capturas/01-login.png` … `capturas/15-pedido-detalhe.png`.
+
+Inclui painel, cadastros, pedidos, entregas/rotas, faturas, relatórios,
+inclusão, usuários, auditoria, privacidade e formulários de criação.

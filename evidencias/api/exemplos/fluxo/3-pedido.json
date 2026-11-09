@@ -1,0 +1,20 @@
+{
+  "id": 3,
+  "compradorId": 4,
+  "compradorNome": "Carla Compradora",
+  "dataPedido": "2026-11-09T23:43:59.9029786Z",
+  "status": "AguardandoAprovacao",
+  "valorTotal": 60.00,
+  "enderecoEntrega": "Rua da Evidência, 10 — Campinas/SP",
+  "itens": [
+    {
+      "id": 3,
+      "produtoId": 4,
+      "produtoNome": "Produto Evidência 1794267839",
+      "loteId": 3,
+      "quantidade": 10,
+      "precoUnitario": 6.00,
+      "subtotal": 60.00
+    }
+  ]
+}

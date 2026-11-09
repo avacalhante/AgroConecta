@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "pedidoId": 1,
+    "numero": "FAT-2026-0001",
+    "valor": 425.00,
+    "status": "Emitida",
+    "emitidaEm": "2026-11-04T10:30:00",
+    "pagoEm": null
+  }
+]

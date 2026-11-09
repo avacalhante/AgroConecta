@@ -1,0 +1,20 @@
+[
+  {
+    "produtorId": 1,
+    "produtor": "Paulo Produtor",
+    "cooperativa": "Cooperativa Vale Verde",
+    "comunidade": "Tradicional",
+    "pedidos": 1,
+    "quantidade": 50.000,
+    "valorTotal": 425.00
+  },
+  {
+    "produtorId": 2,
+    "produtor": "Maria Quilombola",
+    "cooperativa": "Cooperativa Vale Verde",
+    "comunidade": "Quilombola",
+    "pedidos": 1,
+    "quantidade": 100.000,
+    "valorTotal": 320.00
+  }
+]

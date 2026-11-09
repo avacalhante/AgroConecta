@@ -47,7 +47,12 @@ Detalhamento (etapas, variáveis e checklist de produção) em
 
 ## Status
 
-- `Dockerfile`, `docker-compose.yml` e workflow versionados.
-- Sintaxe YAML validada.
-- Execução real do `docker compose` pendente: o socket do Docker não está
-  acessível no ambiente atual.
+- `Dockerfile`, `docker-compose.yml` e workflow versionados e com sintaxe validada.
+- Engine Docker disponível (acesso via `newgrp docker`), porém o plugin
+  `docker compose` não está instalado neste ambiente.
+- SQL Server 2022 validado em container com `docker run`, incluindo script
+  completo, migrations, procedures e triggers (ver `../banco/`).
+- Aplicação executada contra o banco real com health `200` e fluxo completo
+  capturado em `../api/exemplos/fluxo/` e `../web/capturas/`.
+- Build da imagem da aplicação não executado por limite de espaço em disco
+  (≈ 3 GB livres no momento da validação).

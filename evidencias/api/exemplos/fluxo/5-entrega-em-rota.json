@@ -1,0 +1,11 @@
+{
+  "id": 3,
+  "pedidoId": 3,
+  "status": "EmRota",
+  "dataPrevista": "2026-11-25",
+  "dataRealizada": null,
+  "latitude": null,
+  "longitude": null,
+  "fotoUrl": null,
+  "observacao": null
+}

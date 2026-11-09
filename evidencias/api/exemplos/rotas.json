@@ -1,0 +1,25 @@
+[
+  {
+    "id": 1,
+    "data": "2026-11-05",
+    "motorista": "Marcos Motorista",
+    "veiculo": "ABC-1234 · Van",
+    "status": "EmAndamento",
+    "entregas": [
+      {
+        "id": 1,
+        "pedidoId": 1,
+        "comprador": "",
+        "status": "EmRota",
+        "dataPrevista": "2026-11-05"
+      },
+      {
+        "id": 2,
+        "pedidoId": 2,
+        "comprador": "",
+        "status": "Pendente",
+        "dataPrevista": "2026-11-06"
+      }
+    ]
+  }
+]

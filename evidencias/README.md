@@ -18,8 +18,11 @@ Cada subpasta corresponde a um critério de avaliação do manual.
 - Build e testes automatizados executados em 2026-11-09: **159 testes aprovados**, 0 falhas.
 - Cobertura: **Domain 92,5%** e **Application 93,8%** (meta ≥ 70%).
 - Contrato OpenAPI com **22 caminhos**, incluindo rotas e faturas.
-- Validação do banco em SQL Server real pendente: o ambiente atual não expõe o
-  socket do Docker. Os scripts estão versionados e prontos para execução.
+- SQL Server 2022 validado em container: script completo, migrations, 3 procedures
+  e 3 triggers executados com sucesso (detalhes em `banco/`).
+- Fluxo completo validado via API real e telas capturadas em `web/capturas/`.
+- Build da imagem Docker da aplicação pendente por limite de espaço em disco e
+  ausência do plugin `docker compose` (engine disponível).
 
 ## Como reproduzir
 

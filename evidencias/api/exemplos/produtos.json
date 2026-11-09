@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": 2,
+      "nome": "Alface crespa",
+      "categoria": "Hortifrúti",
+      "unidade": "unidade",
+      "precoBase": 3.20,
+      "ativo": true
+    },
+    {
+      "id": 3,
+      "nome": "Milho verde",
+      "categoria": "Grãos",
+      "unidade": "kg",
+      "precoBase": 5.40,
+      "ativo": true
+    },
+    {
+      "id": 1,
+      "nome": "Tomate italiano",
+      "categoria": "Hortifrúti",
+      "unidade": "kg",
+      "precoBase": 8.50,
+      "ativo": true
+    }
+  ],
+  "page": 1,
+  "pageSize": 20,
+  "total": 3
+}

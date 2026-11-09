@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pedidos · AgroConecta</title>
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/site.css?v=zeR5PHeeHbxfGkL8WV86OzdoF6UnjuCmnagaocD-cbo" />
+    <link rel="stylesheet" href="/AgroConecta.Web.styles.css?v=j4_zDPdGwjQ_GXWHlNaTAYN65rlavxlmrNYQZEaG2RI" />
+</head>
+<body>
+    <a b-m5kf3e5nlv class="visually-hidden-focusable p-2 bg-white" href="#conteudo">Pular para o conteúdo</a>
+
+    <header b-m5kf3e5nlv>
+        <nav b-m5kf3e5nlv class="navbar navbar-expand-lg navbar-dark bg-success" aria-label="Navegação principal">
+            <div b-m5kf3e5nlv class="container-fluid">
+                <a class="navbar-brand fw-semibold" href="/">AgroConecta</a>
+                <button b-m5kf3e5nlv class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal"
+                        aria-controls="menuPrincipal" aria-expanded="false" aria-label="Abrir menu">
+                    <span b-m5kf3e5nlv class="navbar-toggler-icon"></span>
+                </button>
+
+                <div b-m5kf3e5nlv class="collapse navbar-collapse" id="menuPrincipal">
+                        <ul b-m5kf3e5nlv class="navbar-nav me-auto">
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/">Painel</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/Produtores">Produtores</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/Cooperativas">Cooperativas</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/ProdutosWeb">Produtos</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/PedidosWeb">Pedidos</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/EntregasWeb">Entregas</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/Faturas">Faturas</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/api/v1/relatorios/vendas-produtor">Relatórios</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/Inclusao">Inclusão</a></li>
+                            <li b-m5kf3e5nlv class="nav-item"><a class="nav-link" href="/Usuarios">Usuários</a></li>
+                        </ul>
+                        <div b-m5kf3e5nlv class="d-flex align-items-center gap-3 text-white">
+                            <span b-m5kf3e5nlv class="small">
+                                Ana Administradora
+                                <span b-m5kf3e5nlv class="badge bg-light text-success ms-1">Admin</span>
+                            </span>
+                            <form method="post" class="m-0" action="/Account/Logout">
+                                
+                                <button b-m5kf3e5nlv type="submit" class="btn btn-sm btn-outline-light">Sair</button>
+                            <input name="__RequestVerificationToken" type="hidden" value="***" /></form>
+                        </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main b-m5kf3e5nlv id="conteudo" role="main" class="container pb-5">
+        
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 mb-3">
+    <div>
+        <h1 class="h3 mb-1">Pedidos</h1>
+        <p class="text-muted mb-0">Compras realizadas na plataforma.</p>
+    </div>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-sm-5 col-md-4">
+        <label for="status" class="form-label">Status</label>
+        <select id="status" name="status" class="form-select">
+            <option value="">Todos</option>
+                <option value="Rascunho">Rascunho</option>
+                <option value="AguardandoAprovacao">AguardandoAprovacao</option>
+                <option value="Aprovado">Aprovado</option>
+                <option value="EmSeparacao">EmSeparacao</option>
+                <option value="EmRota">EmRota</option>
+                <option value="Entregue">Entregue</option>
+                <option value="Cancelado">Cancelado</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-success">Filtrar</button>
+        <a class="btn btn-outline-secondary" href="/PedidosWeb">Limpar</a>
+    </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <caption class="visually-hidden">Lista de pedidos</caption>
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Comprador</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="text-center">Itens</th>
+                    <th scope="col" class="text-end">Total</th>
+                    <th scope="col" class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                    <tr>
+                        <td>3</td>
+                        <td>Carla Compradora</td>
+                        <td>09/11/2026 20:43</td>
+                        <td><span class="badge bg-warning text-dark">AguardandoAprovacao</span></td>
+                        <td class="text-center">1</td>
+                        <td class="text-end">R$ 60,00</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-success" href="/PedidosWeb/Detalhe/3">Detalhe</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Carla Compradora</td>
+                        <td>04/11/2026 07:30</td>
+                        <td><span class="badge bg-info text-dark">Aprovado</span></td>
+                        <td class="text-center">1</td>
+                        <td class="text-end">R$ 320,00</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-success" href="/PedidosWeb/Detalhe/2">Detalhe</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Carla Compradora</td>
+                        <td>03/11/2026 06:00</td>
+                        <td><span class="badge bg-primary">EmRota</span></td>
+                        <td class="text-center">1</td>
+                        <td class="text-end">R$ 425,00</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-success" href="/PedidosWeb/Detalhe/1">Detalhe</a>
+                        </td>
+                    </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center small text-muted">
+        <span>3 pedido(s)</span>
+        <span>Página 1</span>
+    </div>
+</div>
+
+    </main>
+
+    <footer b-m5kf3e5nlv class="border-top footer text-muted bg-white">
+        <div b-m5kf3e5nlv class="container py-3 small d-flex justify-content-between flex-wrap gap-2">
+            <span b-m5kf3e5nlv>&copy; 2026 AgroConecta · PIM IV</span>
+            <span b-m5kf3e5nlv>
+                Protótipo acadêmico — dados fictícios de demonstração.
+                <a class="ms-2" href="/Home/Privacidade">Privacidade e LGPD</a>
+            </span>
+        </div>
+    </footer>
+
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/site.js?v=y_Ngd8W21UpuCUhEqGbUKDEqFnNfTjAfb24GhJJGUyM"></script>
+    
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "id": 3,
+  "pedidoId": 3,
+  "status": "EmRota",
+  "dataPrevista": "2026-11-25",
+  "dataRealizada": null,
+  "latitude": -22.9068,
+  "longitude": -43.1729,
+  "fotoUrl": "/uploads/entregas/66d928f17d694dfe8e0bc97a355c4973.png",
+  "observacao": "Entrega confirmada"
+}

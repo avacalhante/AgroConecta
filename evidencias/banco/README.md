@@ -61,5 +61,25 @@ docker compose -f docker/docker-compose.yml up -d --build
 sqlcmd -S localhost,1433 -U sa -P 'AgroConecta@2026' -C -i db/script-completo.sql
 ```
 
-> A execução contra SQL Server real ainda não foi capturada: o socket do Docker
-> não está acessível neste ambiente. Os scripts compilam e estão versionados.
+## Validação executada em 2026-11-09
+
+SQL Server 2022 em container (`docker run ... mcr.microsoft.com/mssql/server:2022-latest`):
+
+| Verificação | Resultado |
+|---|---|
+| `db/script-completo.sql` em banco limpo | Executado com sucesso (tabelas + procedures + triggers + seed) |
+| Tabelas criadas | 15 (14 de negócio + `__EFMigrationsHistory`) |
+| Procedures | 3 |
+| Triggers | 3 |
+| Seed | 5 usuários, 2 pedidos, 2 entregas, 1 fatura |
+| `dotnet ef database update` em banco limpo | Migration `20261109220959_Inicial` aplicada |
+| `sp_CalcularTotalPedido` | Total do pedido 1 = R$ 425,00 |
+| `sp_ConsolidarEstoqueLote` | Lote 1: entradas 120, saídas 50, saldo 70 |
+| `sp_RelatorioVendasProdutor` | 1 pedido, total R$ 425,00 |
+| `trg_Entrega_LogStatus` | Log de auditoria criado na mudança de status |
+| `trg_Produtor_AuditaAprovacao` | 2 logs gerados na mudança de situação |
+| `trg_ItemPedido_MovimentoEstoque` | Movimento de estoque gerado na inclusão de item |
+
+> O plugin `docker compose` não está instalado neste ambiente (apenas o engine).
+> A validação foi feita com comandos `docker run`/`docker exec` equivalentes.
+> O build da imagem da aplicação não foi executado por falta de espaço em disco.

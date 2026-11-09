@@ -1,0 +1,8 @@
+trg_Produtor_AuditaAprovacao (mudanca real de status)
+Antes|Depois
+-----|------
+2|4
+trg_ItemPedido_MovimentoEstoque
+MovimentosAntes|MovimentosDepois
+---------------|----------------
+4|5

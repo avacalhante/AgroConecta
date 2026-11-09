@@ -1,0 +1,47 @@
+{
+  "items": [
+    {
+      "id": 2,
+      "compradorId": 4,
+      "compradorNome": "Carla Compradora",
+      "dataPedido": "2026-11-04T10:30:00",
+      "status": "Aprovado",
+      "valorTotal": 320.00,
+      "enderecoEntrega": "Av. dos Ipês, 45 — Valinhos/SP",
+      "itens": [
+        {
+          "id": 2,
+          "produtoId": 2,
+          "produtoNome": "Alface crespa",
+          "loteId": 2,
+          "quantidade": 100.000,
+          "precoUnitario": 3.20,
+          "subtotal": 320.00
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "compradorId": 4,
+      "compradorNome": "Carla Compradora",
+      "dataPedido": "2026-11-03T09:00:00",
+      "status": "EmRota",
+      "valorTotal": 425.00,
+      "enderecoEntrega": "Rua das Acácias, 120 — Campinas/SP",
+      "itens": [
+        {
+          "id": 1,
+          "produtoId": 1,
+          "produtoNome": "Tomate italiano",
+          "loteId": 1,
+          "quantidade": 50.000,
+          "precoUnitario": 8.50,
+          "subtotal": 425.00
+        }
+      ]
+    }
+  ],
+  "page": 1,
+  "pageSize": 20,
+  "total": 2
+}

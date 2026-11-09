@@ -92,3 +92,15 @@ Erro de regra de negócio (`422 Unprocessable Entity`):
 `AgroConecta.Tests/Api/` cobre autenticação, escopo por papel, validações,
 rotas, faturas e o fluxo completo produtor → produto → lote → pedido → rota →
 entrega → fatura.
+
+## Execução real capturada
+
+Em 2026-11-09 a API foi executada contra SQL Server 2022 em container:
+
+- `swagger.json` — documento OpenAPI gerado pela aplicação.
+- `exemplos/` — respostas reais de login, indicadores, pedidos, rotas, faturas,
+  produtos e relatório de vendas.
+- `exemplos/fluxo/1-produto.json` … `8-fatura.json` — fluxo completo executado
+  via API, incluindo evidência de entrega em multipart.
+- `exemplos/fluxo/resumo.json` — identificadores e fatura gerada
+  (`FAT-2026-00003`, pedido de R$ 60,00).
