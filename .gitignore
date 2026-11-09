@@ -1,0 +1,42 @@
+# Editores e arquivos temporários
+*.kate-swp
+*.swp
+*~
+.DS_Store
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+TestResults/
+coverage/
+*.trx
+
+# Node, Expo e React Native
+node_modules/
+.expo/
+.expo-shared/
+dist/
+web-build/
+*.tsbuildinfo
+mobile/android/
+mobile/ios/
+
+# Ambiente e segredos
+.env
+.env.*
+!.env.example
+appsettings.Development.json
+
+# Banco e artefatos locais
+*.db
+*.mdf
+*.ldf
+*.bak
+*.log
+
+# Ferramentas
+.idea/
+*.iml
