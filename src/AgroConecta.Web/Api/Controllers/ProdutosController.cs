@@ -1,12 +1,15 @@
 using AgroConecta.Application.Common;
 using AgroConecta.Application.Produtos;
 using AgroConecta.Web.Api.Contratos;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AgroConecta.Web.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/produtos")]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [Produces("application/json")]
 public class ProdutosController(
     ICasoDeUso<ListarProdutosConsulta, Domain.Common.ResultadoPaginado<ProdutoDto>> listar,

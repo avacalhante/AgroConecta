@@ -1,6 +1,8 @@
+using AgroConecta.Application.Auth;
 using AgroConecta.Domain.Abstractions;
 using AgroConecta.Infrastructure.Persistence;
 using AgroConecta.Infrastructure.Repositorios;
+using AgroConecta.Infrastructure.Seguranca;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,9 +12,11 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
-        string connectionString)
+        string connectionString,
+        JwtConfiguracao jwtConfiguracao)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
+        ArgumentNullException.ThrowIfNull(jwtConfiguracao);
 
         services.AddDbContext<AgroConectaDbContext>(options =>
             options.UseSqlServer(connectionString, sqlServer =>
@@ -26,6 +30,9 @@ public static class DependencyInjection
         services.AddScoped<ILoteRepositorio, LoteRepositorio>();
         services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
         services.AddScoped<IUnidadeDeTrabalho, UnidadeDeTrabalho>();
+
+        services.AddSingleton<ISenhaHasher, SenhaHasherAdapter>();
+        services.AddSingleton<IGeradorToken>(_ => new GeradorTokenJwt(jwtConfiguracao));
 
         return services;
     }

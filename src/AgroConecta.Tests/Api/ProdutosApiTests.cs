@@ -12,7 +12,7 @@ public class ProdutosApiTests(ApiFactory fabrica) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Lista_produtos_paginados_do_seed()
     {
-        var cliente = fabrica.CreateClient();
+        var cliente = fabrica.CreateAuthenticatedClient();
 
         var resposta = await cliente.GetAsync("/api/v1/produtos?page=1&pageSize=10");
 
@@ -29,7 +29,7 @@ public class ProdutosApiTests(ApiFactory fabrica) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Filtra_produtos_ativos()
     {
-        var cliente = fabrica.CreateClient();
+        var cliente = fabrica.CreateAuthenticatedClient();
 
         var pagina = await cliente.GetFromJsonAsync<PaginaTeste>("/api/v1/produtos?ativo=true", Json);
 
@@ -40,7 +40,7 @@ public class ProdutosApiTests(ApiFactory fabrica) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Busca_produto_por_id()
     {
-        var cliente = fabrica.CreateClient();
+        var cliente = fabrica.CreateAuthenticatedClient();
 
         var produto = await cliente.GetFromJsonAsync<ProdutoDto>("/api/v1/produtos/1", Json);
 
@@ -51,7 +51,7 @@ public class ProdutosApiTests(ApiFactory fabrica) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Retorna_404_em_problem_details_para_produto_inexistente()
     {
-        var cliente = fabrica.CreateClient();
+        var cliente = fabrica.CreateAuthenticatedClient();
 
         var resposta = await cliente.GetAsync("/api/v1/produtos/999");
         var corpo = await resposta.Content.ReadAsStringAsync();
@@ -65,7 +65,7 @@ public class ProdutosApiTests(ApiFactory fabrica) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Cria_produto_e_retorna_201()
     {
-        var cliente = fabrica.CreateClient();
+        var cliente = fabrica.CreateAuthenticatedClient();
 
         var resposta = await cliente.PostAsJsonAsync(
             "/api/v1/produtos",
@@ -83,7 +83,7 @@ public class ProdutosApiTests(ApiFactory fabrica) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Retorna_400_com_erros_por_campo_em_entrada_invalida()
     {
-        var cliente = fabrica.CreateClient();
+        var cliente = fabrica.CreateAuthenticatedClient();
 
         var resposta = await cliente.PostAsJsonAsync(
             "/api/v1/produtos",

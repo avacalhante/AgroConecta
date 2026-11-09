@@ -1,3 +1,5 @@
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using AgroConecta.Infrastructure.Persistence;
 using AgroConecta.Infrastructure.Persistence.Seed;
 using Microsoft.AspNetCore.Hosting;
@@ -43,4 +45,30 @@ public class ApiFactory : WebApplicationFactory<Program>
 
         return host;
     }
+
+    /// <summary>Cliente HTTP autenticado com um usuário do seed.</summary>
+    public HttpClient CreateAuthenticatedClient(
+        string email = "admin@agroconecta.local",
+        string senha = "Admin@123")
+    {
+        var cliente = CreateClient();
+        var resposta = cliente.PostAsJsonAsync(
+            "/api/v1/auth/login",
+            new { email, senha }).GetAwaiter().GetResult();
+
+        resposta.EnsureSuccessStatusCode();
+
+        var login = resposta.Content
+            .ReadFromJsonAsync<LoginTeste>()
+            .GetAwaiter()
+            .GetResult()
+            ?? throw new InvalidOperationException("Login de teste não retornou tokens.");
+
+        cliente.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", login.AccessToken);
+
+        return cliente;
+    }
+
+    private sealed record LoginTeste(string AccessToken, string RefreshToken, int ExpiresIn);
 }

@@ -1,3 +1,4 @@
+using AgroConecta.Application.Auth;
 using AgroConecta.Application.Common;
 using AgroConecta.Application.Pedidos;
 using AgroConecta.Application.Produtos;
@@ -21,6 +22,10 @@ public static class DependencyInjection
         services.AddScoped<ICasoDeUso<CriarPedidoComando, PedidoDto>, CriarPedidoCasoDeUso>();
         services.AddScoped<ICasoDeUso<AlterarStatusPedidoComando, PedidoDto>, AlterarStatusPedidoCasoDeUso>();
         services.AddScoped<ICasoDeUso<int, PedidoDto>, ObterPedidoCasoDeUso>();
+
+        services.AddScoped<ICasoDeUso<LoginComando, LoginResultado>, AutenticarCasoDeUso>();
+        services.AddScoped<ICasoDeUso<RenovarTokenComando, LoginResultado>, RenovarTokenCasoDeUso>();
+        services.AddScoped<ICasoDeUso<int, UsuarioDto>, ObterUsuarioAtualCasoDeUso>();
 
         return services;
     }
