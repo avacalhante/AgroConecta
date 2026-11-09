@@ -39,7 +39,8 @@ Em dispositivo físico, use o IP da máquina na rede local (`http://192.168.0.10
 
 ```text
 src/
-├── api/         cliente HTTP e configuração (B3)
+├── api/         cliente HTTP, endpoints e configuração (B3)
+├── auth/        sessão segura e AuthContext (B2)
 ├── components/  design system: botão, campo, cartão, badge, estados
 ├── db/          SQLite local (B6)
 ├── mock/        fixtures das telas de demonstração
@@ -59,6 +60,22 @@ src/
   - `EntregaDetalhe`, `EntregaStatus` e `EntregaEvidencia` (parâmetro `entregaId`).
 - `MainTabs`: Início, Lotes, Entregas e Perfil. As telas de aba usam `MainTabScreenProps`,
   que combina a navegação das abas com a pilha principal.
+
+## Autenticação
+
+- Login em `POST /auth/login` com e-mail e senha do seed.
+- A sessão (`accessToken`, `refreshToken`, validade e usuário) fica no `expo-secure-store`,
+  na chave `agroconecta.sessao`.
+- Ao abrir o app, a sessão é restaurada; se o access token estiver vencido, o refresh é
+  tentado automaticamente. Enquanto houver sessão, um timer renova o token em 75% da validade.
+- `401` no refresh encerra a sessão local e volta ao login. Falha de rede ou `5xx` mantém a
+  sessão para permitir operação offline.
+- `executarAutenticado` repete uma operação uma vez após renovar o token em caso de `401`.
+- O logout chama `POST /auth/logout` (melhor esforço) e sempre limpa a sessão local.
+
+O cliente HTTP usa `fetch` estruturado em `src/api/http.ts`, com `AbortController` para
+_timeout_ e normalização de erros RFC 7807 em `ApiError`. A camada completa de retry,
+interceptors e mock entra na tarefa B3.
 
 ## Design system
 

@@ -1,23 +1,34 @@
 import { StyleSheet, Text } from 'react-native';
 
-import { Button, Card, Screen } from '../components';
+import { useAuth } from '../auth/AuthContext';
+import { Button, Card, InfoRow, Screen } from '../components';
 import { theme } from '../theme/tokens';
 import { typography } from '../theme/typography';
+import type { Papel } from '../types/dominio';
 
-type PerfilScreenProps = {
-  onSair: () => void;
+const ROTULOS_PAPEL: Record<Papel, string> = {
+  Admin: 'Administrador',
+  Produtor: 'Produtor',
+  Comprador: 'Comprador',
+  Motorista: 'Motorista',
 };
 
-/** Perfil provisório; sessão real e sincronização entram nas tarefas B2 e B6. */
-export function PerfilScreen({ onSair }: PerfilScreenProps) {
+/** Perfil do usuário autenticado; a fila offline entra na tarefa B6. */
+export function PerfilScreen() {
+  const { sair, saindo, usuario } = useAuth();
+
+  if (!usuario) {
+    return null;
+  }
+
   return (
     <Screen scrollable>
       <Text style={[typography.titulo, styles.titulo]}>Perfil</Text>
 
       <Card title="Usuário">
-        <Text style={typography.secao}>Usuário de desenvolvimento</Text>
-        <Text style={styles.detalhe}>Papel: Produtor</Text>
-        <Text style={styles.detalhe}>Sessão simulada até a tarefa B2</Text>
+        <Text style={typography.secao}>{usuario.nome}</Text>
+        <InfoRow label="E-mail" value={usuario.email} />
+        <InfoRow label="Papel" value={ROTULOS_PAPEL[usuario.papel]} />
       </Card>
 
       <Card title="Sincronização">
@@ -27,9 +38,13 @@ export function PerfilScreen({ onSair }: PerfilScreenProps) {
       </Card>
 
       <Button
-        title="Sair"
+        title={saindo ? 'Saindo…' : 'Sair'}
         variant="danger"
-        onPress={onSair}
+        onPress={() => {
+          void sair();
+        }}
+        loading={saindo}
+        disabled={saindo}
         style={styles.botaoSair}
         testID="botao-sair"
       />

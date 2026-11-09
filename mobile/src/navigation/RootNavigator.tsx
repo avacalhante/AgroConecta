@@ -1,7 +1,8 @@
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useState } from 'react';
 
+import { useAuth } from '../auth/AuthContext';
+import { LoadingState, Screen } from '../components';
 import { LoginScreen } from '../screens/LoginScreen';
 import { theme } from '../theme/tokens';
 import { MainStack } from './MainStack';
@@ -21,24 +22,25 @@ const navigationTheme = {
   },
 };
 
-/**
- * Navegação raiz provisória.
- * A tarefa B2 substitui o estado local por um contexto de autenticação real.
- */
+/** Alterna entre o fluxo anônimo (login) e o aplicativo autenticado. */
 export function RootNavigator() {
-  const [autenticado, setAutenticado] = useState(false);
+  const { restaurando, usuario } = useAuth();
+
+  if (restaurando) {
+    return (
+      <Screen>
+        <LoadingState message="Restaurando sessão…" />
+      </Screen>
+    );
+  }
 
   return (
     <NavigationContainer theme={navigationTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {autenticado ? (
-          <Stack.Screen name="Main">
-            {() => <MainStack onSair={() => setAutenticado(false)} />}
-          </Stack.Screen>
+        {usuario ? (
+          <Stack.Screen name="Main" component={MainStack} />
         ) : (
-          <Stack.Screen name="Login">
-            {() => <LoginScreen onEntrar={() => setAutenticado(true)} />}
-          </Stack.Screen>
+          <Stack.Screen name="Login" component={LoginScreen} />
         )}
       </Stack.Navigator>
     </NavigationContainer>

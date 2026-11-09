@@ -9,12 +9,8 @@ import type { MainTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
-type MainTabsProps = {
-  onSair: () => void;
-};
-
 /** Navegação principal do aplicativo após o login. */
-export function MainTabs({ onSair }: MainTabsProps) {
+export function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -34,9 +30,7 @@ export function MainTabs({ onSair }: MainTabsProps) {
       <Tab.Screen name="Inicio" component={InicioScreen} options={{ title: 'Início' }} />
       <Tab.Screen name="Lotes" component={LotesScreen} options={{ title: 'Lotes' }} />
       <Tab.Screen name="Entregas" component={EntregasScreen} options={{ title: 'Entregas' }} />
-      <Tab.Screen name="Perfil" options={{ title: 'Perfil' }}>
-        {() => <PerfilScreen onSair={onSair} />}
-      </Tab.Screen>
+      <Tab.Screen name="Perfil" component={PerfilScreen} options={{ title: 'Perfil' }} />
     </Tab.Navigator>
   );
 }

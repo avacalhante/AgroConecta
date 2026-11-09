@@ -1,22 +1,37 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { mensagemDeErroLogin } from '../api/erros';
+import { useAuth } from '../auth/AuthContext';
 import { Button, Field, Screen } from '../components';
 import { theme } from '../theme/tokens';
 import { typography } from '../theme/typography';
 
-type LoginScreenProps = {
-  onEntrar: () => void;
-};
-
-/**
- * Tela de login provisória da fundação (B1).
- * A autenticação real, com tokens e armazenamento seguro, entra na tarefa B2.
- */
-export function LoginScreen({ onEntrar }: LoginScreenProps) {
+/** Login com e-mail e senha do seed; a sessão é persistida pelo AuthContext. */
+export function LoginScreen() {
+  const { entrar } = useAuth();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const podeEntrar = email.trim().length > 0 && senha.length >= 8;
+  const [erro, setErro] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
+  const podeEntrar = email.trim().length > 0 && senha.length >= 8 && !enviando;
+
+  async function submeter() {
+    if (!podeEntrar) {
+      return;
+    }
+
+    setErro(null);
+    setEnviando(true);
+
+    try {
+      await entrar(email.trim(), senha);
+    } catch (falha) {
+      setErro(mensagemDeErroLogin(falha));
+    } finally {
+      setEnviando(false);
+    }
+  }
 
   return (
     <Screen scrollable>
@@ -49,11 +64,24 @@ export function LoginScreen({ onEntrar }: LoginScreenProps) {
           testID="campo-senha"
         />
 
+        {erro ? (
+          <Text
+            style={styles.erro}
+            accessibilityRole="alert"
+            accessibilityLiveRegion="polite"
+            testID="mensagem-erro"
+          >
+            {erro}
+          </Text>
+        ) : null}
+
         <Button
           title="Entrar"
-          onPress={onEntrar}
+          onPress={() => {
+            void submeter();
+          }}
           disabled={!podeEntrar}
-          style={styles.botao}
+          loading={enviando}
           testID="botao-entrar"
         />
 
@@ -78,8 +106,9 @@ const styles = StyleSheet.create({
   formulario: {
     gap: theme.spacing.md,
   },
-  botao: {
-    marginTop: theme.spacing.sm,
+  erro: {
+    ...typography.corpo,
+    color: theme.colors.danger,
   },
   aviso: {
     ...typography.legenda,

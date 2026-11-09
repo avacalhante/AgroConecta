@@ -10,12 +10,8 @@ import type { MainStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
-type MainStackProps = {
-  onSair: () => void;
-};
-
 /** Fluxos autenticados: abas principais e detalhes de lote e entrega. */
-export function MainStack({ onSair }: MainStackProps) {
+export function MainStack() {
   return (
     <Stack.Navigator
       screenOptions={{
@@ -29,9 +25,7 @@ export function MainStack({ onSair }: MainStackProps) {
         contentStyle: { backgroundColor: theme.colors.background },
       }}
     >
-      <Stack.Screen name="Tabs" options={{ headerShown: false }}>
-        {() => <MainTabs onSair={onSair} />}
-      </Stack.Screen>
+      <Stack.Screen name="Tabs" component={MainTabs} options={{ headerShown: false }} />
       <Stack.Screen
         name="LoteDetalhe"
         component={LoteDetalheScreen}
