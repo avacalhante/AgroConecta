@@ -4,6 +4,7 @@ import { EntregaDetalheScreen } from '../screens/EntregaDetalheScreen';
 import { EntregaEvidenciaScreen } from '../screens/EntregaEvidenciaScreen';
 import { EntregaStatusScreen } from '../screens/EntregaStatusScreen';
 import { LoteDetalheScreen } from '../screens/LoteDetalheScreen';
+import { NovoLoteScreen } from '../screens/NovoLoteScreen';
 import { theme } from '../theme/tokens';
 import { MainTabs } from './MainTabs';
 import type { MainStackParamList } from './types';
@@ -30,6 +31,11 @@ export function MainStack() {
         name="LoteDetalhe"
         component={LoteDetalheScreen}
         options={{ title: 'Detalhe do lote' }}
+      />
+      <Stack.Screen
+        name="NovoLote"
+        component={NovoLoteScreen}
+        options={{ title: 'Novo lote' }}
       />
       <Stack.Screen
         name="EntregaDetalhe"

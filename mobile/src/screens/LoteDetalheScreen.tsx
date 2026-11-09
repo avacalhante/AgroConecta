@@ -1,24 +1,40 @@
+import { useQuery } from '@tanstack/react-query';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Card, ErrorState, InfoRow, Screen, StatusBadge } from '../components';
-import { buscarLote } from '../mock/dados';
+import { Card, ErrorState, InfoRow, LoadingState, Screen, StatusBadge } from '../components';
+import { buscarLoteLocal } from '../db/lotes';
 import type { MainStackScreenProps } from '../navigation/types';
 import { theme } from '../theme/tokens';
 import { typography } from '../theme/typography';
 import { formatarData, formatarQuantidade } from '../utils/format';
 
-/** Detalhe do lote com dados de exemplo; a fonte real entra na tarefa B4. */
-export function LoteDetalheScreen({ route, navigation }: MainStackScreenProps<'LoteDetalhe'>) {
-  const lote = buscarLote(route.params.loteId);
+/** Detalhe do lote salvo localmente, inclusive quando ainda não sincronizou. */
+export function LoteDetalheScreen({ route }: MainStackScreenProps<'LoteDetalhe'>) {
+  const { codigoRastreio } = route.params;
+  const consulta = useQuery({
+    queryKey: ['lote-local', codigoRastreio],
+    queryFn: () => buscarLoteLocal(codigoRastreio),
+  });
+
+  if (consulta.isLoading) {
+    return (
+      <Screen>
+        <LoadingState message="Carregando lote…" />
+      </Screen>
+    );
+  }
+
+  const lote = consulta.data;
 
   if (!lote) {
     return (
-      <Screen scrollable>
+      <Screen>
         <ErrorState
           title="Lote não encontrado"
-          message="O lote pode ter sido removido ou ainda não foi sincronizado."
-          onRetry={() => navigation.goBack()}
-          retryLabel="Voltar"
+          message="O lote pode ter sido removido do dispositivo."
+          onRetry={() => {
+            void consulta.refetch();
+          }}
         />
       </Screen>
     );
@@ -27,21 +43,27 @@ export function LoteDetalheScreen({ route, navigation }: MainStackScreenProps<'L
   return (
     <Screen scrollable>
       <View style={styles.cabecalho}>
-        <Text style={[typography.titulo, styles.titulo]}>{lote.produto}</Text>
+        <Text style={[typography.titulo, styles.titulo]}>{lote.produtoNome}</Text>
         <StatusBadge status={lote.status} />
       </View>
 
       <Card title="Dados do lote">
         <InfoRow
           label="Quantidade"
-          value={formatarQuantidade(lote.quantidade, lote.unidade)}
+          value={formatarQuantidade(lote.quantidade, lote.produtoUnidade)}
         />
         <InfoRow label="Data da colheita" value={formatarData(lote.dataColheita)} />
         <InfoRow label="Código de rastreio" value={lote.codigoRastreio} />
+        <InfoRow
+          label="Envio"
+          value={lote.sincronizado ? 'Sincronizado' : 'Pendente de envio'}
+        />
       </Card>
 
       <Text style={styles.aviso}>
-        Dados de exemplo. A edição e a sincronização do lote entram na tarefa B4.
+        {lote.sincronizado
+          ? 'Este lote já está no servidor.'
+          : 'O lote está salvo no aparelho e será enviado quando houver conexão.'}
       </Text>
     </Screen>
   );

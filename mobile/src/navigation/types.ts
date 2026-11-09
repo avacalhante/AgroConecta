@@ -11,7 +11,8 @@ export type RootStackParamList = {
 /** Pilha autenticada: abas principais e telas de detalhe por fluxo. */
 export type MainStackParamList = {
   Tabs: NavigatorScreenParams<MainTabParamList> | undefined;
-  LoteDetalhe: { loteId: string };
+  NovoLote: undefined;
+  LoteDetalhe: { codigoRastreio: string };
   EntregaDetalhe: { entregaId: number };
   EntregaStatus: { entregaId: number };
   EntregaEvidencia: { entregaId: number };

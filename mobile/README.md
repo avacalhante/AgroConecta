@@ -43,11 +43,12 @@ src/
 ├── api/         cliente HTTP, endpoints e configuração (B3)
 ├── auth/        sessão segura e AuthContext (B2)
 ├── components/  design system: botão, campo, cartão, badge, estados
-├── db/          SQLite local (B6)
+├── db/          SQLite local: produtos, lotes e fila (B4/B6)
+├── hooks/       consultas e sincronização usadas pelas telas
 ├── mock/        fixtures das telas de demonstração
 ├── navigation/  pilha raiz, pilha autenticada e abas principais
 ├── screens/     telas do produtor e do motorista
-├── sync/        fila offline e sincronização (B6)
+├── sync/        conectividade, fila e sincronização (B4/B6)
 ├── theme/       tokens, tipografia e tema de status
 ├── types/       tipos de domínio e, na B3, tipos gerados do OpenAPI
 └── utils/       formatadores e helpers
@@ -90,6 +91,19 @@ na tarefa B6.
 - Erros seguem `contracts/errors.md`: `400` mantém mensagens por campo; `401` renova ou
   encerra a sessão; `403`/`422` não são repetidos; `409` ao criar lote é sucesso;
   `5xx`/rede ficam como `ApiError` com `status` 0.
+
+## Fluxo do produtor e operação offline
+
+- `NovoLote` valida produto, data (`AAAA-MM-DD`, não futura) e quantidade, gera o
+  `codigoRastreio` com `expo-crypto` (`randomUUID`) e grava primeiro no SQLite.
+- Cada lote cria uma operação `criar_lote` na fila persistente; o envio não bloqueia a tela.
+- `sincronizarLotes` envia a fila, trata `409` como já sincronizado e depois puxa
+  `/lotes/meus` e `/produtos` para atualizar o banco local.
+- A lista lê sempre do SQLite e mostra “Pendente de envio” enquanto o lote não sobe.
+- A sincronização roda ao focar a aba de lotes e no gesto de puxar para atualizar.
+  Retry com backoff, listener de reconexão e conflitos visíveis entram na B6.
+- O catálogo de produtos do seed é gravado na primeira abertura, permitindo criar lote
+  sem nenhuma chamada de rede.
 
 ## Design system
 
