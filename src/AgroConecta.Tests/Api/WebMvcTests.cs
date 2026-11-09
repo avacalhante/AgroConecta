@@ -63,10 +63,71 @@ public class WebMvcTests(ApiFactory fabrica) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Login_com_cookie_permite_acessar_o_painel()
     {
-        var cliente = fabrica.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
-        {
-            AllowAutoRedirect = false,
-        });
+        var cliente = await CriarClienteAutenticadoAsync();
+
+        var painel = await cliente.GetAsync("/");
+        Assert.Equal(HttpStatusCode.OK, painel.StatusCode);
+
+        var html = await painel.Content.ReadAsStringAsync();
+        Assert.Contains("Painel administrativo", html);
+    }
+
+    [Theory]
+    [InlineData("/Produtores")]
+    [InlineData("/Cooperativas")]
+    [InlineData("/ProdutosWeb")]
+    [InlineData("/PedidosWeb")]
+    [InlineData("/EntregasWeb")]
+    [InlineData("/EntregasWeb/Criar")]
+    [InlineData("/Faturas")]
+    [InlineData("/Relatorios/VendasPorProdutor")]
+    [InlineData("/Inclusao")]
+    [InlineData("/Usuarios")]
+    [InlineData("/Usuarios/Auditoria")]
+    public async Task Admin_acessa_todas_as_telas_web(string caminho)
+    {
+        var cliente = await CriarClienteAutenticadoAsync();
+
+        var resposta = await cliente.GetAsync(caminho);
+
+        Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
+    }
+
+    [Fact]
+    public async Task Produtor_nao_acessa_tela_de_usuarios()
+    {
+        var cliente = await CriarClienteAutenticadoAsync(
+            "produtor@agroconecta.local",
+            "Produtor@123");
+
+        var resposta = await cliente.GetAsync("/Usuarios");
+
+        Assert.Equal(HttpStatusCode.Redirect, resposta.StatusCode);
+        Assert.Contains("/Account/AcessoNegado", resposta.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Produtor_nao_acessa_relatorio_de_vendas()
+    {
+        var cliente = await CriarClienteAutenticadoAsync(
+            "produtor@agroconecta.local",
+            "Produtor@123");
+
+        var resposta = await cliente.GetAsync("/Relatorios/VendasPorProdutor");
+
+        Assert.Equal(HttpStatusCode.Redirect, resposta.StatusCode);
+        Assert.Contains("/Account/AcessoNegado", resposta.Headers.Location?.OriginalString);
+    }
+
+    private async Task<HttpClient> CriarClienteAutenticadoAsync(
+        string email = "admin@agroconecta.local",
+        string senha = "Admin@123")
+    {
+        var cliente = fabrica.CreateClient(
+            new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+            {
+                AllowAutoRedirect = false,
+            });
 
         var token = await ObterTokenAntiforgeryAsync(cliente, "/Account/Login");
 
@@ -74,18 +135,13 @@ public class WebMvcTests(ApiFactory fabrica) : IClassFixture<ApiFactory>
             "/Account/Login",
             new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["Email"] = "admin@agroconecta.local",
-                ["Senha"] = "Admin@123",
+                ["Email"] = email,
+                ["Senha"] = senha,
                 ["__RequestVerificationToken"] = token,
             }));
 
         Assert.Equal(HttpStatusCode.Redirect, resposta.StatusCode);
-
-        var painel = await cliente.GetAsync("/");
-        Assert.Equal(HttpStatusCode.OK, painel.StatusCode);
-
-        var html = await painel.Content.ReadAsStringAsync();
-        Assert.Contains("Painel administrativo", html);
+        return cliente;
     }
 
     private static async Task<string> ObterTokenAntiforgeryAsync(HttpClient cliente, string caminho)
