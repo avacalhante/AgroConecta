@@ -46,8 +46,8 @@ src/
 ├── db/          SQLite local: produtos, lotes, entregas e fila (B4/B6)
 ├── hooks/       consultas e sincronização usadas pelas telas
 ├── navigation/  pilha raiz, pilha autenticada e abas principais
-├── screens/     telas do produtor e do motorista
-├── sync/        conectividade, fila e sincronização (B4/B6)
+├── screens/     telas do produtor, do motorista e evidência (B7)
+├── sync/        conectividade, fila, evidências e sincronização (B4–B7)
 ├── theme/       tokens, tipografia e tema de status
 ├── types/       tipos de domínio e, na B3, tipos gerados do OpenAPI
 └── utils/       formatadores e helpers
@@ -116,8 +116,27 @@ feito pela fila de sincronização, descrita abaixo.
 - Falhas de rede mantêm a operação na fila e o detalhe da entrega mostra o aviso.
 - A sincronização roda ao focar a aba de entregas, no gesto de puxar para atualizar e pelo
   coordenador global de sincronização.
-- A tela de evidência já recebe a entrega real; câmera, localização e upload multipart
-  entram na B7.
+- A tela de evidência captura ou escolhe uma foto, comprime em JPEG, obtém as
+  coordenadas e envia por multipart, com fila local quando não há conexão.
+
+## Evidência da entrega
+
+- Câmera e galeria usam `expo-image-picker`; se a permissão da câmera for negada, a tela
+  orienta a usar a galeria. Falha ao abrir a câmera também permite a galeria.
+- A imagem é redimensionada para até 1280 px de largura e comprimida em JPEG (70%) com
+  `expo-image-manipulator`, reduzindo o tamanho do upload.
+- A foto comprimida é copiada para `documentDirectory/evidencias/`; o arquivo só é apagado
+  depois que o servidor aceita o envio. A cópia evita perder a evidência quando o cache
+  do sistema é limpo.
+- A localização usa `expo-location` com permissão em primeiro plano. Se o GPS falhar, o app
+  tenta a última localização conhecida e avisa que ela é aproximada. Se a permissão for
+  negada sem poder perguntar de novo, aparece o botão “Abrir ajustes”.
+- O envio grava a evidência no SQLite (`evidencia_pendente`) e enfileira
+  `enviar_evidencia`; o PUT multipart é idempotente. Sem conexão, a tela e o detalhe da
+  entrega mostram que o envio está pendente. Erros definitivos ficam em `evidencia_erro`
+  e o arquivo local é preservado para uma nova tentativa.
+- O coordenador global também envia evidências ao reconectar, com o mesmo backoff e limite
+  de cinco tentativas das demais operações.
 
 ## Sincronização, reconexão e modo avião
 

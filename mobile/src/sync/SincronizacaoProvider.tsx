@@ -14,6 +14,7 @@ import { AppState } from 'react-native';
 import { useAuth } from '../auth/AuthContext';
 import { contarConflitosSincronizacao } from '../db/estadoSync';
 import { sincronizarEntregas } from './entregas';
+import { sincronizarEvidencias } from './evidencias';
 import { contarItensFila } from './fila';
 import { sincronizarLotes, type ResultadoSincronizacao } from './lotes';
 
@@ -70,11 +71,12 @@ export function SincronizacaoProvider({ children }: PropsWithChildren) {
       try {
         const lotes = await sincronizarLotes(executarAutenticado);
         const entregas = await sincronizarEntregas(executarAutenticado);
+        const evidencias = await sincronizarEvidencias(executarAutenticado);
         const combinado: ResultadoSincronizacao = {
-          offline: lotes.offline || entregas.offline,
-          enviados: lotes.enviados + entregas.enviados,
-          conflitos: lotes.conflitos + entregas.conflitos,
-          falhas: lotes.falhas + entregas.falhas,
+          offline: lotes.offline || entregas.offline || evidencias.offline,
+          enviados: lotes.enviados + entregas.enviados + evidencias.enviados,
+          conflitos: lotes.conflitos + entregas.conflitos + evidencias.conflitos,
+          falhas: lotes.falhas + entregas.falhas + evidencias.falhas,
         };
 
         setOnline(!combinado.offline);

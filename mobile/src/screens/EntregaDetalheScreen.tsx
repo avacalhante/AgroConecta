@@ -78,6 +78,18 @@ export function EntregaDetalheScreen({
         </Text>
       ) : null}
 
+      {entrega.evidenciaPendente ? (
+        <Text style={styles.pendente} accessibilityLiveRegion="polite">
+          Evidência salva no aparelho. O envio acontece quando houver conexão.
+        </Text>
+      ) : null}
+
+      {entrega.evidenciaErro ? (
+        <Text style={styles.erro} accessibilityRole="alert">
+          Falha na evidência: {entrega.evidenciaErro}
+        </Text>
+      ) : null}
+
       <Button
         title="Alterar status"
         onPress={() => navigation.navigate('EntregaStatus', { entregaId: entrega.id })}

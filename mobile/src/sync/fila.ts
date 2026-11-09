@@ -50,7 +50,9 @@ export async function enfileirarOperacao(
      VALUES (?, ?, ?, ?)
      ON CONFLICT(tipo, referencia) DO UPDATE SET
        payload = excluded.payload,
-       ultimo_erro = NULL`,
+       tentativas = 0,
+       ultimo_erro = NULL,
+       proxima_tentativa_em = NULL`,
     [tipo, referencia, JSON.stringify(payload), new Date().toISOString()],
   );
 }

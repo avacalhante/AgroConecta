@@ -57,6 +57,8 @@ const ENTREGA_LOCAL: EntregaLocal = {
   observacao: null,
   pendente: false,
   erroSincronizacao: null,
+  evidenciaPendente: false,
+  evidenciaErro: null,
 };
 
 const ENTREGA_SERVIDOR: Entrega = {

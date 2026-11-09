@@ -2,7 +2,7 @@ import * as SQLite from 'expo-sqlite';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
 const NOME_BANCO = 'agroconecta.db';
-const VERSAO_ESQUEMA = 3;
+const VERSAO_ESQUEMA = 4;
 
 let promessaBanco: Promise<SQLiteDatabase> | null = null;
 
@@ -87,11 +87,19 @@ PRAGMA user_version = 2;
 `);
   }
 
-  if (versao < VERSAO_ESQUEMA) {
+  if (versao < 3) {
     await banco.execAsync(`
 ALTER TABLE lotes ADD COLUMN erro_sincronizacao TEXT;
 ALTER TABLE fila_sincronizacao ADD COLUMN proxima_tentativa_em TEXT;
 PRAGMA user_version = 3;
+`);
+  }
+
+  if (versao < VERSAO_ESQUEMA) {
+    await banco.execAsync(`
+ALTER TABLE entregas ADD COLUMN evidencia_pendente INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE entregas ADD COLUMN evidencia_erro TEXT;
+PRAGMA user_version = 4;
 `);
   }
 

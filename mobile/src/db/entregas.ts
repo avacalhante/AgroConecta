@@ -14,6 +14,8 @@ export type EntregaLocal = {
   observacao: string | null;
   pendente: boolean;
   erroSincronizacao: string | null;
+  evidenciaPendente: boolean;
+  evidenciaErro: string | null;
 };
 
 type LinhaEntrega = {
@@ -29,6 +31,8 @@ type LinhaEntrega = {
   atualizado_em: string;
   pendente: number;
   erro_sincronizacao: string | null;
+  evidencia_pendente: number;
+  evidencia_erro: string | null;
 };
 
 function paraEntrega(linha: LinhaEntrega): EntregaLocal {
@@ -44,6 +48,8 @@ function paraEntrega(linha: LinhaEntrega): EntregaLocal {
     observacao: linha.observacao,
     pendente: linha.pendente === 1,
     erroSincronizacao: linha.erro_sincronizacao,
+    evidenciaPendente: linha.evidencia_pendente === 1,
+    evidenciaErro: linha.evidencia_erro,
   };
 }
 
@@ -83,13 +89,15 @@ export async function salvarEntregaServidor(
        status = excluded.status,
        data_prevista = excluded.data_prevista,
        data_realizada = excluded.data_realizada,
-       latitude = excluded.latitude,
-       longitude = excluded.longitude,
-       foto_url = excluded.foto_url,
-       observacao = excluded.observacao,
+       latitude = CASE WHEN entregas.evidencia_pendente = 1 OR entregas.evidencia_erro IS NOT NULL THEN entregas.latitude ELSE excluded.latitude END,
+       longitude = CASE WHEN entregas.evidencia_pendente = 1 OR entregas.evidencia_erro IS NOT NULL THEN entregas.longitude ELSE excluded.longitude END,
+       foto_url = CASE WHEN entregas.evidencia_pendente = 1 OR entregas.evidencia_erro IS NOT NULL THEN entregas.foto_url ELSE excluded.foto_url END,
+       observacao = CASE WHEN entregas.evidencia_pendente = 1 OR entregas.evidencia_erro IS NOT NULL THEN entregas.observacao ELSE excluded.observacao END,
        atualizado_em = excluded.atualizado_em,
        pendente = 0,
-       erro_sincronizacao = ${expressaoErro}`,
+       erro_sincronizacao = ${expressaoErro},
+       evidencia_pendente = entregas.evidencia_pendente,
+       evidencia_erro = entregas.evidencia_erro`,
     [
       entrega.id,
       entrega.pedidoId,
@@ -169,6 +177,56 @@ export async function reverterPendenciaComErro(
   const banco = await obterBanco();
   await banco.runAsync(
     'UPDATE entregas SET pendente = 0, erro_sincronizacao = ? WHERE id = ?',
+    [mensagem, id],
+  );
+}
+
+/** Salva a evidência no aparelho e a marca como pendente de envio. */
+export async function salvarEvidenciaLocal(
+  id: number,
+  latitude: number,
+  longitude: number,
+  fotoUrl: string,
+  observacao?: string,
+): Promise<void> {
+  const banco = await obterBanco();
+  await banco.runAsync(
+    `UPDATE entregas
+       SET latitude = ?, longitude = ?, foto_url = ?,
+           observacao = COALESCE(?, observacao),
+           evidencia_pendente = 1,
+           evidencia_erro = NULL,
+           atualizado_em = ?
+     WHERE id = ?`,
+    [latitude, longitude, fotoUrl, observacao ?? null, new Date().toISOString(), id],
+  );
+}
+
+/** Confirma a evidência aceita pelo servidor, sem mexer no status local. */
+export async function salvarEvidenciaServidor(entrega: Entrega): Promise<void> {
+  const banco = await obterBanco();
+  await banco.runAsync(
+    `UPDATE entregas
+       SET latitude = ?, longitude = ?, foto_url = ?, observacao = ?,
+           evidencia_pendente = 0,
+           evidencia_erro = NULL,
+           atualizado_em = ?
+     WHERE id = ?`,
+    [
+      entrega.latitude ?? null,
+      entrega.longitude ?? null,
+      entrega.fotoUrl ?? null,
+      entrega.observacao ?? null,
+      new Date().toISOString(),
+      entrega.id,
+    ],
+  );
+}
+
+export async function marcarErroEvidencia(id: number, mensagem: string): Promise<void> {
+  const banco = await obterBanco();
+  await banco.runAsync(
+    'UPDATE entregas SET evidencia_pendente = 0, evidencia_erro = ? WHERE id = ?',
     [mensagem, id],
   );
 }
