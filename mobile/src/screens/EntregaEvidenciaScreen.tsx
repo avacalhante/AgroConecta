@@ -281,7 +281,9 @@ export function EntregaEvidenciaScreen({
 
   return (
     <Screen scrollable>
-      <Text style={[typography.titulo, styles.titulo]}>Evidência da entrega</Text>
+      <Text style={[typography.titulo, styles.titulo]} accessibilityRole="header">
+        Evidência da entrega
+      </Text>
       <Text style={styles.descricao}>Pedido {entrega.pedidoId}</Text>
 
       {entrega.evidenciaPendente ? (
@@ -452,11 +454,13 @@ const styles = StyleSheet.create({
   },
   linhaBotoes: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: theme.spacing.sm,
     marginTop: theme.spacing.md,
   },
   botaoFoto: {
-    flex: 1,
+    flexGrow: 1,
+    flexBasis: 140,
   },
   detalhe: {
     ...typography.legenda,

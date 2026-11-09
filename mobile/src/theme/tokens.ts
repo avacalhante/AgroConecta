@@ -12,6 +12,7 @@ export const colors = {
   textInverse: '#FFFFFF',
   border: '#C9D2C7',
   borderStrong: '#9DAA9B',
+  borderControl: '#6F7B6D',
   danger: '#B3261E',
   dangerDark: '#8C1D18',
   dangerLight: '#F9DEDC',

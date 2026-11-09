@@ -46,7 +46,9 @@ export function EntregaDetalheScreen({
   return (
     <Screen scrollable>
       <View style={styles.cabecalho}>
-        <Text style={[typography.titulo, styles.titulo]}>Pedido {entrega.pedidoId}</Text>
+        <Text style={[typography.titulo, styles.titulo]} accessibilityRole="header">
+          Pedido {entrega.pedidoId}
+        </Text>
         <StatusBadge status={entrega.status} />
       </View>
 

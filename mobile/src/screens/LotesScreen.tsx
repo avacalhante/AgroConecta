@@ -56,7 +56,9 @@ export function LotesScreen({ navigation }: MainTabScreenProps<'Lotes'>) {
   return (
     <Screen padded={false}>
       <View style={styles.cabecalho}>
-        <Text style={typography.titulo}>Meus lotes</Text>
+        <Text style={typography.titulo} accessibilityRole="header">
+          Meus lotes
+        </Text>
         <Text style={styles.descricao}>
           Registre a colheita mesmo sem internet; o envio fica pendente até a conexão.
         </Text>

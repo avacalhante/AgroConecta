@@ -30,7 +30,11 @@ export function Card({
 }: CardProps) {
   const conteudo = (
     <>
-      {title ? <Text style={styles.title}>{title}</Text> : null}
+      {title ? (
+        <Text style={styles.title} accessibilityRole="header">
+          {title}
+        </Text>
+      ) : null}
       {children}
     </>
   );

@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   input: {
     minHeight: touchTarget,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.borderControl,
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,

@@ -34,7 +34,9 @@ export function PerfilScreen() {
 
   return (
     <Screen scrollable>
-      <Text style={[typography.titulo, styles.titulo]}>Perfil</Text>
+      <Text style={[typography.titulo, styles.titulo]} accessibilityRole="header">
+        Perfil
+      </Text>
 
       <Card title="Usuário">
         <Text style={typography.secao}>{usuario.nome}</Text>

@@ -81,7 +81,9 @@ export function EntregaStatusScreen({ route, navigation }: MainStackScreenProps<
 
   return (
     <Screen scrollable>
-      <Text style={[typography.titulo, styles.titulo]}>Atualizar status</Text>
+      <Text style={[typography.titulo, styles.titulo]} accessibilityRole="header">
+        Atualizar status
+      </Text>
 
       <Card title="Situação atual">
         <View style={styles.linhaStatus}>
@@ -99,7 +101,12 @@ export function EntregaStatusScreen({ route, navigation }: MainStackScreenProps<
         />
       ) : (
         <>
-          <Text style={[typography.secao, styles.secao]}>Escolha o novo status</Text>
+          <Text
+            style={[typography.secao, styles.secao]}
+            accessibilityRole="header"
+          >
+            Escolha o novo status
+          </Text>
           <Card>
             {opcoes.map((status) => {
               const meta = statusMeta[status];
@@ -177,7 +184,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: theme.spacing.sm,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderControl,
     borderRadius: theme.radius.md,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
@@ -194,7 +201,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: theme.colors.borderStrong,
+    borderColor: theme.colors.borderControl,
   },
   marcadorAtivo: {
     borderColor: theme.colors.primary,

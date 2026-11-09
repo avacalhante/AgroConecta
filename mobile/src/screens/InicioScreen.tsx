@@ -28,7 +28,9 @@ export function InicioScreen({ navigation }: MainTabScreenProps<'Inicio'>) {
 
   return (
     <Screen scrollable>
-      <Text style={typography.titulo}>Início</Text>
+      <Text style={typography.titulo} accessibilityRole="header">
+        Início
+      </Text>
       <Text style={styles.descricao}>
         Visão rápida da operação. Os números abaixo são ilustrativos até a integração com
         `/api/v1/indicadores`.
@@ -43,7 +45,12 @@ export function InicioScreen({ navigation }: MainTabScreenProps<'Inicio'>) {
 
       {mostrarLotes || mostrarEntregas ? (
         <>
-          <Text style={[typography.secao, styles.secaoTitulo]}>Ações rápidas</Text>
+          <Text
+            style={[typography.secao, styles.secaoTitulo]}
+            accessibilityRole="header"
+          >
+            Ações rápidas
+          </Text>
           <View style={styles.acoes}>
             {mostrarLotes ? (
               <Button

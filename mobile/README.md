@@ -171,6 +171,14 @@ Para observar o backoff, deixe a API indisponível: a operação permanece na fi
 tentativas ficam espaçadas. Ao retornar, a próxima tentativa envia a operação. Um erro
 4xx definitivo aparece no lote ou no detalhe da entrega e não é reenviado.
 
+## Acessibilidade
+
+O checklist WCAG 2.1 AA, os contrastes calculados e o roteiro de teste com TalkBack/VoiceOver
+ficam em [`../evidencias/mobile/acessibilidade.md`](../evidencias/mobile/acessibilidade.md).
+As telas usam títulos com papel de cabeçalho, alvos mínimos de 48 px, rótulos explícitos e
+avisos com `accessibilityLiveRegion`; as bordas de campos e opções usam `borderControl`
+para atingir 3:1. A validação em aparelho com leitor de tela ainda precisa ser executada.
+
 ## Design system
 
 `src/components/` concentra `Button`, `Field`, `Card`, `StatusBadge`, `EmptyState`,

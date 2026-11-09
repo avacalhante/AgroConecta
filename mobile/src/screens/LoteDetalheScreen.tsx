@@ -43,7 +43,9 @@ export function LoteDetalheScreen({ route }: MainStackScreenProps<'LoteDetalhe'>
   return (
     <Screen scrollable>
       <View style={styles.cabecalho}>
-        <Text style={[typography.titulo, styles.titulo]}>{lote.produtoNome}</Text>
+        <Text style={[typography.titulo, styles.titulo]} accessibilityRole="header">
+          {lote.produtoNome}
+        </Text>
         <StatusBadge status={lote.status} />
       </View>
 

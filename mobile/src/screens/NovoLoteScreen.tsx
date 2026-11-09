@@ -94,7 +94,9 @@ export function NovoLoteScreen({ navigation }: MainStackScreenProps<'NovoLote'>)
 
   return (
     <Screen scrollable>
-      <Text style={[typography.titulo, styles.titulo]}>Novo lote</Text>
+      <Text style={[typography.titulo, styles.titulo]} accessibilityRole="header">
+        Novo lote
+      </Text>
       <Text style={styles.descricao}>
         O lote é salvo no aparelho primeiro e enviado automaticamente quando houver conexão.
       </Text>
@@ -210,7 +212,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: theme.spacing.sm,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderControl,
     borderRadius: theme.radius.md,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
@@ -227,7 +229,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: theme.colors.borderStrong,
+    borderColor: theme.colors.borderControl,
   },
   marcadorAtivo: {
     borderColor: theme.colors.primary,

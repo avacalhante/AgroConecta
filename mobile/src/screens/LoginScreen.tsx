@@ -36,7 +36,9 @@ export function LoginScreen() {
   return (
     <Screen scrollable>
       <View style={styles.cabecalho}>
-        <Text style={styles.titulo}>AgroConecta</Text>
+        <Text style={styles.titulo} accessibilityRole="header">
+          AgroConecta
+        </Text>
         <Text style={typography.corpoMuted}>
           Gestão da cadeia de suprimentos e inclusão digital na agricultura familiar.
         </Text>

@@ -49,7 +49,9 @@ export function EntregasScreen({ navigation }: MainTabScreenProps<'Entregas'>) {
   return (
     <Screen padded={false}>
       <View style={styles.cabecalho}>
-        <Text style={typography.titulo}>Minhas entregas</Text>
+        <Text style={typography.titulo} accessibilityRole="header">
+          Minhas entregas
+        </Text>
         <Text style={styles.descricao}>
           Atualize o status mesmo sem internet; a lista reflete o estado local.
         </Text>
