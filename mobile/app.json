@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "AgroConecta",
+    "slug": "agroconecta",
+    "scheme": "agroconecta",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "br.edu.unip.agroconecta"
+    },
+    "android": {
+      "package": "br.edu.unip.agroconecta",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-sqlite",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O AgroConecta usa suas fotos para registrar a evidência da entrega.",
+          "cameraPermission": "O AgroConecta usa a câmera para registrar a evidência da entrega."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "O AgroConecta usa sua localização para registrar o local da entrega."
+        }
+      ]
+    ]
+  }
+}
