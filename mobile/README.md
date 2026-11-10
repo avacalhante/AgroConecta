@@ -23,6 +23,14 @@ npm run typecheck    # tsc --noEmit
 npm run check        # lint + typecheck + testes
 ```
 
+## Testes e evidências
+
+A matriz de testes automatizados e manuais fica em
+[`../evidencias/mobile/matriz-testes.md`](../evidencias/mobile/matriz-testes.md).
+Na última execução, `npm run check` passou com 16 suítes e 76 testes, e
+`npx expo export -p android` gerou o bundle sem erro. Os fluxos de login, lote offline,
+sincronização, entrega e evidência foram exercitados em aparelho Android com a API mock.
+
 ## Configuração da API
 
 ```bash
@@ -177,7 +185,9 @@ O checklist WCAG 2.1 AA, os contrastes calculados e o roteiro de teste com TalkB
 ficam em [`../evidencias/mobile/acessibilidade.md`](../evidencias/mobile/acessibilidade.md).
 As telas usam títulos com papel de cabeçalho, alvos mínimos de 48 px, rótulos explícitos e
 avisos com `accessibilityLiveRegion`; as bordas de campos e opções usam `borderControl`
-para atingir 3:1. A validação em aparelho com leitor de tela ainda precisa ser executada.
+para atingir 3:1. A fonte em 200% foi validada em aparelho Android; a validação com
+leitor de tela ainda precisa ser executada, porque o TalkBack não está instalado no
+aparelho de teste.
 
 ## Design system
 

@@ -11,9 +11,9 @@
 1. Inspeção estática dos componentes e das telas (`src/components`, `src/screens`).
 2. Cálculo dos contrastes do tema (`src/theme/tokens.ts` e `src/theme/status.ts`) pela fórmula de luminância relativa da WCAG.
 3. Execução de `npm run check` (ESLint, TypeScript e Jest).
-4. Roteiro manual com TalkBack/VoiceOver e fonte ampliada, documentado abaixo.
+4. Roteiro manual no aparelho, executado parcialmente: fonte ampliada e fluxos principais validados; a leitura com leitor de tela permanece pendente.
 
-> **Limitação desta execução:** um aparelho Android 13 (Xiaomi 2210129SG) foi conectado via ADB, mas o Expo Go 58.0.5 não pôde ser instalado: o aparelho tinha 838 MB livres e o APK tem 215 MB; o instalador retornou `INSTALL_FAILED_INSUFFICIENT_STORAGE`. Não foram apagados arquivos pessoais para liberar espaço. O ambiente também não tem Android SDK/emulador para gerar um APK local. Assim, o teste com leitor de tela e a validação visual em 200% ficam registrados como roteiro pendente de execução em aparelho, não como resultado obtido. A inspeção de código e os cálculos de contraste foram concluídos.
+> **Limitação desta execução:** o Expo Go 58.0.5 foi instalado no Android 13 (Xiaomi 2210129SG) e os fluxos de login, lote offline, sincronização, entrega, localização, galeria e envio de evidência foram executados com a API mock. A fonte do sistema foi ampliada para 200% e os rótulos das abas permaneceram visíveis após o ajuste da barra. O TalkBack não está instalado no aparelho, portanto a leitura de nomes, funções e ordem de foco não foi validada e continua registrada como roteiro pendente. A inspeção de código e os cálculos de contraste foram concluídos.
 
 ## Checklist WCAG 2.1 AA
 
@@ -24,7 +24,7 @@
 | 1.3.2 Sequência significativa | A ordem do código segue a ordem visual: cabeçalho, conteúdo, avisos, ações | Telas de lote, entrega, status e evidência | Atendido por inspeção |
 | 1.4.1 Uso da cor | Status sempre acompanhados de rótulo textual; erros e pendências têm texto e `accessibilityRole="alert"`/`liveRegion` | `StatusBadge`, `EntregaDetalheScreen`, `LotesScreen` | Atendido por inspeção |
 | 1.4.3 Contraste (texto) | Todos os pares de texto do tema passam em AA; ver tabela abaixo | Cálculo de contraste | Atendido |
-| 1.4.4 Redimensionar texto | Nenhum `allowFontScaling={false}` ou `maxFontSizeMultiplier`; botões usam altura mínima, não altura fixa; botões da foto usam `flexWrap` | Componentes e `EntregaEvidenciaScreen` | Pendente de validação em 200% no aparelho |
+| 1.4.4 Redimensionar texto | Nenhum `allowFontScaling={false}` ou `maxFontSizeMultiplier`; botões usam altura mínima, não altura fixa; botões da foto usam `flexWrap`; barra de abas cresce com `fontScale` | Componentes, `EntregaEvidenciaScreen` e `MainTabs` | Atendido em 200% no aparelho |
 | 1.4.10 Reflow | Telas usam `Screen scrollable`; grades usam `flexWrap`; conteúdo longo rola verticalmente | `Screen`, `InicioScreen` | Atendido por inspeção |
 | 1.4.11 Contraste de componentes | Borda de campo e de opção de rádio usa `borderControl` (`#6F7B6D`), 4,44:1 sobre branco e 4,12:1 sobre o fundo; marcador não selecionado usa a mesma cor | `Field`, `NovoLoteScreen`, `EntregaStatusScreen` | Atendido |
 | 1.4.12 Espaçamento de texto | Textos usam estilos sem altura fixa de container; suporta quebra de linha | `typography.ts`, `Card`, `InfoRow` | Pendente de validação visual no aparelho |
@@ -86,8 +86,9 @@ Executar em um aparelho Android com TalkBack (ou iPhone com VoiceOver) e registr
 
 | Data | Aparelho / Android | Leitor | Resultado | Observações |
 |---|---|---|---|---|
-| 09/11/2026 | Xiaomi 2210129SG / Android 13 | TalkBack | Bloqueado antes do teste | Expo Go 58.0.5 não instalou: 838 MB livres e `INSTALL_FAILED_INSUFFICIENT_STORAGE`; nenhum arquivo pessoal foi removido |
-| A preencher | A preencher | TalkBack | A preencher | Liberar espaço no aparelho e executar o roteiro acima |
+| 09/11/2026 | Xiaomi 2210129SG / Android 13 | TalkBack | Bloqueado | Expo Go 58.0.5 instalado e fluxos principais validados; TalkBack não está instalado no aparelho, então o roteiro de leitura está pendente |
+| 09/11/2026 | Xiaomi 2210129SG / Android 13 | Nenhum (fonte 200%) | Aprovado | Rótulos das abas visíveis após ajuste da altura da barra; botões continuaram acionáveis |
+| A preencher | A preencher | TalkBack | A preencher | Instalar o TalkBack e executar o roteiro acima |
 | A preencher | A preencher | VoiceOver | A preencher | Executar em iPhone, se disponível |
 
 ## Verificações automatizadas
@@ -97,14 +98,14 @@ npm run check
 ```
 
 - ESLint e TypeScript sem erros.
-- 11 suítes Jest e 64 testes passando na data desta inspeção.
+- 16 suítes Jest e 76 testes passando na data desta inspeção.
 - Não existe teste automatizado de leitor de tela; a validação depende de aparelho/emulador.
 
 ## Lacunas conhecidas e próximos ajustes
 
-- Liberar espaço no aparelho de teste (ou usar um emulador) e executar o roteiro com TalkBack; anexar capturas/vídeo em `evidencias/mobile/`.
+- Instalar o TalkBack no aparelho de teste (ou usar um emulador) e executar o roteiro; anexar capturas/vídeo em `evidencias/mobile/`.
 - Repetir o roteiro com VoiceOver em um iPhone, se disponível.
-- Validar fonte em 200% e 300% em aparelho real; ajustar rótulos longos se houver corte.
+- Validar fonte em 300% em aparelho real; ajustar rótulos longos se houver corte.
 - Avaliar indicador de foco visível para teclado externo, caso esse uso seja requisito do produto.
 - A prévia de foto remota usa um rótulo genérico; se a imagem tiver descrição específica no contrato, incluir o texto.
 - Repetir o cálculo de contraste sempre que os tokens do tema mudarem.
