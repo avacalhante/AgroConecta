@@ -12,7 +12,7 @@
 |---|---|---|
 | ESLint | `npm run lint` | Sem erros |
 | TypeScript | `npm run typecheck` | Sem erros |
-| Jest/RNTL | `npm test` | 16 suítes, 76 testes passando |
+| Jest/RNTL | `npm test` | 17 suítes, 79 testes passando |
 | Bundle Android | `npx expo export -p android` | Bundle gerado em `/tmp/opencode/expo-export-b9` |
 
 ### Casos automatizados por suíte
@@ -28,6 +28,7 @@
 | `src/auth/AuthContext.test.tsx` | Restauração de sessão, login, logout e refresh autenticado |
 | `src/api/http.test.ts` | Construção de requisições, timeout, cancelamento e erros RFC 7807 |
 | `src/api/mock/servidorFake.test.ts` | Contrato do servidor mock para login, lotes, entregas e evidências |
+| `src/api/entregas.test.ts` | Upload multipart nativo da evidência, erros RFC 7807 e exigência da foto |
 | `src/sync/lotes.test.ts` | Fila offline, conflito 409, erros definitivos e retentativas |
 | `src/sync/entregas.test.ts` | Atualização otimista, fila de status e sincronização |
 | `src/sync/evidencias.test.ts` | Fila de evidência, upload multipart, sucesso, falha e limpeza do arquivo |
@@ -59,5 +60,5 @@
 
 - O TalkBack não está instalado no aparelho e não foi possível validar a leitura de nomes, funções e ordem de foco. O roteiro está detalhado em `acessibilidade.md`.
 - A câmera foi autorizada, mas a captura foi validada apenas pela galeria; o mesmo caminho de compressão e upload é usado nos dois casos.
-- O teste manual usou a API mock. A integração com o backend real e a geração de APK ficam para a etapa B10.
+- A matriz principal usou a API mock; a integração com o backend real e o APK estão em `integracao.md`.
 - O aviso de evidência pendente é atualizado ao reabrir o app; a tela aberta não é atualizada em tempo real após a reconexão.

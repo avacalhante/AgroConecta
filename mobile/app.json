@@ -10,10 +10,12 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "br.edu.unip.agroconecta"
+      "bundleIdentifier": "br.edu.unip.agroconecta",
+      "buildNumber": "1"
     },
     "android": {
       "package": "br.edu.unip.agroconecta",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -26,6 +28,7 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      "./plugins/withCleartextTraffic",
       "expo-sqlite",
       "expo-secure-store",
       [

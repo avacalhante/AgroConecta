@@ -1,12 +1,20 @@
+import * as FileSystem from 'expo-file-system/legacy';
+
 import type { EntregaStatus } from '../types/dominio';
+import { apiConfig } from './config';
 import { usarApiFake } from './fonte';
-import { requisitar } from './http';
+import { ApiError, requisitar } from './http';
 import {
   alterarStatusEntregaFake,
   enviarEvidenciaFake,
   listarMinhasEntregasFake,
 } from './mock/servidorFake';
-import type { Entrega, EntregaStatusRequest, EvidenciaRequest } from './tipos';
+import type {
+  Entrega,
+  EntregaStatusRequest,
+  EvidenciaRequest,
+  ProblemDetails,
+} from './tipos';
 
 export function listarMinhasEntregas(
   token: string,
@@ -38,7 +46,7 @@ export function alterarStatusEntrega(
 }
 
 /** Operação idempotente: a última evidência enviada prevalece. */
-export function enviarEvidencia(
+export async function enviarEvidencia(
   token: string,
   id: number,
   dados: EvidenciaRequest,
@@ -47,26 +55,58 @@ export function enviarEvidencia(
     return enviarEvidenciaFake(token, id, dados);
   }
 
-  const formulario = new FormData();
-  formulario.append('latitude', String(dados.latitude));
-  formulario.append('longitude', String(dados.longitude));
-  if (dados.observacao) {
-    formulario.append('observacao', dados.observacao);
-  }
-  if (dados.foto) {
-    formulario.append(
-      'file',
-      {
-        uri: dados.foto.uri,
-        name: dados.foto.nome,
-        type: dados.foto.tipo,
-      } as unknown as Blob,
-    );
+  if (!dados.foto) {
+    throw new ApiError(422, 'A foto da evidência é obrigatória.');
   }
 
-  return requisitar<Entrega>(`/entregas/${id}/evidencia`, {
-    metodo: 'PUT',
-    formData: formulario,
-    token,
-  });
+  const parametros: Record<string, string> = {
+    latitude: String(dados.latitude),
+    longitude: String(dados.longitude),
+  };
+  if (dados.observacao) {
+    parametros.observacao = dados.observacao;
+  }
+
+  const url = `${apiConfig.baseUrl.replace(/\/+$/, '')}/entregas/${id}/evidencia`;
+
+  try {
+    // O upload nativo evita falhas do FormData com arquivos no Android.
+    const resposta = await FileSystem.uploadAsync(url, dados.foto.uri, {
+      httpMethod: 'PUT',
+      uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+      fieldName: 'file',
+      mimeType: dados.foto.tipo,
+      parameters: parametros,
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (resposta.status < 200 || resposta.status >= 300) {
+      let problema: ProblemDetails | undefined;
+      try {
+        problema = JSON.parse(resposta.body) as ProblemDetails;
+      } catch {
+        problema = undefined;
+      }
+      throw new ApiError(
+        resposta.status,
+        problema?.detail ??
+          problema?.title ??
+          'Não foi possível enviar a evidência.',
+        problema,
+      );
+    }
+
+    return JSON.parse(resposta.body) as Entrega;
+  } catch (erro) {
+    if (erro instanceof ApiError) {
+      throw erro;
+    }
+    throw new ApiError(
+      0,
+      'Sem conexão com o servidor. Verifique a rede e tente novamente.',
+    );
+  }
 }

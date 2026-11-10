@@ -19,6 +19,12 @@ import { contarItensFila } from './fila';
 import { sincronizarLotes, type ResultadoSincronizacao } from './lotes';
 
 const INTERVALO_VERIFICACAO_MS = 30_000;
+const SEM_OPERACOES: ResultadoSincronizacao = {
+  offline: false,
+  enviados: 0,
+  conflitos: 0,
+  falhas: 0,
+};
 
 export type SincronizacaoContextValue = {
   online: boolean | null;
@@ -66,12 +72,23 @@ export function SincronizacaoProvider({ children }: PropsWithChildren) {
       return execucaoRef.current;
     }
 
+    const papel = usuario.papel;
+    const sincronizaLotes = papel === 'Produtor' || papel === 'Admin';
+    // A API restringe essas rotas ao motorista; chamá-las com outro papel gera 403.
+    const sincronizaEntregas = papel === 'Motorista' || papel === 'Admin';
+
     const execucao = (async () => {
       setSincronizando(true);
       try {
-        const lotes = await sincronizarLotes(executarAutenticado);
-        const entregas = await sincronizarEntregas(executarAutenticado);
-        const evidencias = await sincronizarEvidencias(executarAutenticado);
+        const lotes = sincronizaLotes
+          ? await sincronizarLotes(executarAutenticado)
+          : SEM_OPERACOES;
+        const entregas = sincronizaEntregas
+          ? await sincronizarEntregas(executarAutenticado)
+          : SEM_OPERACOES;
+        const evidencias = sincronizaEntregas
+          ? await sincronizarEvidencias(executarAutenticado)
+          : SEM_OPERACOES;
         const combinado: ResultadoSincronizacao = {
           offline: lotes.offline || entregas.offline || evidencias.offline,
           enviados: lotes.enviados + entregas.enviados + evidencias.enviados,

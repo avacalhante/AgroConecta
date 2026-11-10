@@ -27,9 +27,36 @@ npm run check        # lint + typecheck + testes
 
 A matriz de testes automatizados e manuais fica em
 [`../evidencias/mobile/matriz-testes.md`](../evidencias/mobile/matriz-testes.md).
-Na última execução, `npm run check` passou com 16 suítes e 76 testes, e
+A integração real, as correções e o APK estão em
+[`../evidencias/mobile/integracao.md`](../evidencias/mobile/integracao.md).
+Na última execução, `npm run check` passou com 17 suítes e 79 testes, e
 `npx expo export -p android` gerou o bundle sem erro. Os fluxos de login, lote offline,
-sincronização, entrega e evidência foram exercitados em aparelho Android com a API mock.
+sincronização, entrega e evidência foram exercitados em aparelho Android com a API mock
+e com a API real.
+
+## Build Android
+
+O projeto tem perfis em `eas.json` (`development`, `preview` e `production`). O perfil
+`preview` gera APK; os três usam a API real (`EXPO_PUBLIC_API_MOCK=false`). A URL da API
+deve ser passada no ambiente do build, porque varia por rede:
+
+```bash
+EXPO_PUBLIC_API_URL=https://api.exemplo.com/api/v1 npx eas-cli build -p android --profile preview
+```
+
+Para gerar um APK instalável local, sem conta EAS:
+
+```bash
+export ANDROID_HOME="$HOME/Android/Sdk"
+export JAVA_HOME="$HOME/.gradle/jdks/eclipse_adoptium-21-amd64-linux.2"
+npx expo prebuild --platform android
+cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a
+```
+
+O APK fica em `android/app/build/outputs/apk/release/app-release.apk` e embute o bundle
+JavaScript. O template assina o release com a chave de debug, suficiente para demonstração;
+para produção, use HTTPS e uma keystore de release configurada no EAS. O build local exige
+Android SDK com NDK 27.1 e CMake 3.22.1.
 
 ## Configuração da API
 
