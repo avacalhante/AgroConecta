@@ -591,17 +591,25 @@ B0 → B1 → B2 → B3 → B4 → B5 → B6 → B7 → B8 → B9 → B10
 
 ### 8.4 Critérios de aceite da Parte B
 
-- [ ] `npm run lint` e `npm test` verdes.
-- [ ] App roda em Expo Go/emulador.
-- [ ] 6 telas principais implementadas: login, home, lista, detalhe, status/evidência e perfil/sincronização.
-- [ ] Login com usuário do seed.
-- [ ] Produtor registra lote offline e sincroniza.
-- [ ] Motorista atualiza entrega com foto e localização.
-- [ ] Fila offline persiste após fechar e reabrir o app.
-- [ ] Conflito e erro de rede são tratados e visíveis.
-- [ ] Checklist de acessibilidade aplicado.
-- [ ] APK/EAS build gerado.
-- [ ] Evidências em `evidencias/mobile/`.
+> **Status em 2026-11-09:** critérios verificados. `npm run check` (lint +
+> typecheck + Jest) passou com **17 suítes e 79 testes**; a integração real com a
+> API e o APK de release estão registrados em `evidencias/mobile/`.
+
+- [x] `npm run lint` e `npm test` verdes.
+- [x] App roda em Expo Go/emulador.
+- [x] 6 telas principais implementadas: login, home, lista, detalhe, status/evidência e perfil/sincronização.
+- [x] Login com usuário do seed.
+- [x] Produtor registra lote offline e sincroniza.
+- [x] Motorista atualiza entrega com foto e localização.
+- [x] Fila offline persiste após fechar e reabrir o app.
+- [x] Conflito e erro de rede são tratados e visíveis.
+- [x] Checklist de acessibilidade aplicado.
+- [x] APK/EAS build gerado.
+- [x] Evidências em `evidencias/mobile/`.
+
+> O APK de release (`arm64-v8a`, 27 MB) foi gerado localmente com Gradle e
+> instalado no aparelho de teste; o EAS cloud não foi executado por falta de
+> credenciais da conta Expo, mas os perfis estão em `mobile/eas.json`.
 
 ---
 

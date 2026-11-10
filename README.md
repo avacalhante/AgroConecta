@@ -58,6 +58,23 @@ npx expo start
 
 A API expõe Swagger em `http://localhost:5000/swagger` e health em `http://localhost:5000/health`.
 
+## Aplicativo mobile
+
+O app (Expo + React Native) atende o **produtor** (registro de lotes) e o
+**motorista** (entregas com foto e GPS), com operação offline via `expo-sqlite`.
+
+```bash
+cd mobile
+npm install
+npm run check     # lint + typecheck + testes
+npm start         # Expo
+```
+
+- A URL da API vem de `EXPO_PUBLIC_API_URL` (padrão `http://localhost:5000/api/v1`).
+  Em aparelho físico, use o IP da máquina ou `adb reverse tcp:5000 tcp:5000`.
+- `EXPO_PUBLIC_API_MOCK=true` executa o app com o servidor fake em memória.
+- Build do APK, integração real e limitações em `evidencias/mobile/` e `mobile/README.md`.
+
 ### Banco de dados
 
 - SQL Server 2022 em container, banco `AgroConecta`, porta `1433`.
@@ -98,12 +115,7 @@ npx openapi-typescript contracts/openapi.yaml -o mobile/src/types/api.d.ts
 
 ## Desenvolvimento paralelo
 
-O projeto usa dois worktrees:
-
-```bash
-git worktree add ../PIM_4-web -b feat/web-core
-git worktree add ../PIM_4-mobile -b feat/mobile-app
-```
+O projeto foi desenvolvido em duas frentes integradas em `main`:
 
 - **Parte A:** `src/`, `db/`, `docker/`, `.github/`, `scripts/`
 - **Parte B:** `mobile/`
@@ -116,5 +128,5 @@ Consulte `PLAN.md` para o cronograma, pacotes de trabalho, critérios de aceite 
 - `docs/manual.md` — manual do PIM IV (fonte de verdade).
 - `docs/rascunho.md` — escopo funcional v2.0.
 - `PLAN.md` — plano de desenvolvimento.
-- `evidencias/` — pacote de evidências da Parte A (Web, API, banco, DevOps, testes, inclusão e gestão).
-- `docs/devops.md` e `docs/seguranca-lgpd.md` — execução, implantação e checklists (worktree `feat/web-core`).
+- `evidencias/` — pacote de evidências das Partes A e B (Web, API, banco, DevOps, mobile, testes, inclusão e gestão).
+- `docs/devops.md` e `docs/seguranca-lgpd.md` — execução, implantação e checklists.
