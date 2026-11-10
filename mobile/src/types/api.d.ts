@@ -292,6 +292,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/rotas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lista as rotas programadas */
+        get: operations["listarRotas"];
+        put?: never;
+        /**
+         * Programa uma rota e cria as entregas dos pedidos
+         * @description Apenas Admin. Cada pedido selecionado gera uma entrega pendente.
+         */
+        post: operations["criarRota"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/faturas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lista as faturas emitidas */
+        get: operations["listarFaturas"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/faturas/pedido/{pedidoId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Gera a fatura de um pedido
+         * @description Operação idempotente por pedido. Apenas Admin.
+         */
+        post: operations["gerarFatura"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/indicadores": {
         parameters: {
             query?: never;
@@ -301,6 +359,40 @@ export interface paths {
         };
         /** Retorna indicadores do dashboard */
         get: operations["obterIndicadores"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/relatorios/vendas-produtor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Vendas consolidadas por produtor */
+        get: operations["vendasPorProdutor"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auditoria": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lista os registros de auditoria */
+        get: operations["listarAuditoria"];
         put?: never;
         post?: never;
         delete?: never;
@@ -320,7 +412,13 @@ export interface components {
         /** @enum {string} */
         EntregaStatus: "Pendente" | "EmRota" | "Entregue" | "Falha" | "Cancelada";
         /** @enum {string} */
+        RotaStatus: "Planejada" | "EmAndamento" | "Concluida" | "Cancelada";
+        /** @enum {string} */
+        FaturaStatus: "Pendente" | "Emitida" | "Paga" | "Cancelada";
+        /** @enum {string} */
         LoteStatus: "Disponivel" | "Reservado" | "Esgotado";
+        /** @enum {string} */
+        Comunidade: "Tradicional" | "Quilombola" | "Assentamento" | "Indigena" | "Outro";
         ProblemDetails: {
             /** Format: uri */
             type?: string;
@@ -503,6 +601,49 @@ export interface components {
             ocorridoEm: string;
             observacao?: string;
         };
+        Rota: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: date */
+            data?: string;
+            motorista?: string;
+            veiculo?: string;
+            status?: components["schemas"]["RotaStatus"];
+            entregas?: components["schemas"]["EntregaRota"][];
+        };
+        EntregaRota: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            pedidoId?: number;
+            comprador?: string;
+            status?: components["schemas"]["EntregaStatus"];
+            /** Format: date */
+            dataPrevista?: string;
+        };
+        RotaRequest: {
+            /** Format: date */
+            data: string;
+            /** Format: int64 */
+            motoristaId: number;
+            /** Format: int64 */
+            veiculoId: number;
+            pedidoIds: number[];
+        };
+        Fatura: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            pedidoId?: number;
+            numero?: string;
+            /** Format: double */
+            valor?: number;
+            status?: components["schemas"]["FaturaStatus"];
+            /** Format: date-time */
+            emitidaEm?: string | null;
+            /** Format: date-time */
+            pagoEm?: string | null;
+        };
         Indicadores: {
             pedidosMes?: number;
             /** Format: double */
@@ -515,6 +656,29 @@ export interface components {
             entregasComEvidenciaPercentual?: number;
             /** Format: double */
             telasAcessiveisPercentual?: number;
+        };
+        VendaProdutor: {
+            /** Format: int64 */
+            produtorId?: number;
+            produtor?: string;
+            cooperativa?: string | null;
+            comunidade?: components["schemas"]["Comunidade"];
+            pedidos?: number;
+            /** Format: double */
+            quantidade?: number;
+            /** Format: double */
+            valorTotal?: number;
+        };
+        LogAcesso: {
+            /** Format: int64 */
+            id?: number;
+            usuario?: string | null;
+            acao?: string;
+            entidade?: string;
+            entidadeId?: string | null;
+            ip?: string | null;
+            /** Format: date-time */
+            criadoEm?: string;
         };
     };
     responses: {
@@ -1088,6 +1252,103 @@ export interface operations {
             403: components["responses"]["Forbidden"];
         };
     };
+    listarRotas: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Rotas programadas */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rota"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    criarRota: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RotaRequest"];
+            };
+        };
+        responses: {
+            /** @description Rota criada */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rota"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["UnprocessableEntity"];
+        };
+    };
+    listarFaturas: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Faturas emitidas */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Fatura"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    gerarFatura: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pedidoId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Fatura emitida (ou já existente) */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Fatura"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["UnprocessableEntity"];
+        };
+    };
     obterIndicadores: {
         parameters: {
             query?: never;
@@ -1104,6 +1365,56 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Indicadores"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    vendasPorProdutor: {
+        parameters: {
+            query?: {
+                inicio?: string;
+                fim?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Vendas por produtor no período */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VendaProdutor"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    listarAuditoria: {
+        parameters: {
+            query?: {
+                limite?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Registros de auditoria */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LogAcesso"][];
                 };
             };
             401: components["responses"]["Unauthorized"];
